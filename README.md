@@ -71,6 +71,28 @@ preventing users from accessing our site without https.
 ![S3 Policy](resources/readme-s3-policy.png)
 
 
+### API Service & Microservices
+
+An AWS API Gateway was created & mapped with endpoints corresponding to those  
+defined in the Design Document.
+
+![API Gateway](resources/readme-apigw.png)
+
+Each endpoint forwards its request to a Lambda microservice, where they execute 
+their code.
+
+![Lambda](resources/readme-lambda.png)
+
+
+### Application Database
+
+An AWS MySQL RDS instance was setup with a schema defined by our DB 
+Administrator (Andy). The database contains data stored by the Lambda 
+functions.
+
+![RDS](resources/readme-rds.png)
+
+
 ### Front-end CICD Pipeline
 
 A CodePipeline (AWS's proprietary CICD Pipeline) was created.
