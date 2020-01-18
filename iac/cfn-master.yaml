@@ -1,0 +1,25 @@
+# cfn-master.yaml
+# Author: Brian Jopling, Jan 2020
+#
+# Description:
+#   Deploys nested templates to automate the creation of all infrastructure
+#   required by StudyBuddy.
+#
+# Usage: - Manual validation of ACM cert must be done during the deployment process.
+#           Otherwise, the stack will hang. (TODO, automate)
+#        - Upon completion of deployment, an Alias record must be created to point
+#           the custom domain url to the CloudFront distribution of the Hosted UI. (TODO, automate)
+#
+# Pre-requisites: Google Client ID and Client Secret must be stored in SecretsManager before deploying.
+#
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Master template for creating all StudyBuddy infra.
+
+Resources:
+
+  NestedStackCognito:
+    Type: AWS::CloudFormation::Stack
+    Properties: 
+      TemplateURL: https://studybuddy-templates.s3.amazonaws.com/cfn-nested-cognito.yaml
+      TimeoutInMinutes: 60

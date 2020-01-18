@@ -18,11 +18,12 @@ This repository contains or shall contain the following:
 ### /iac
 
 - Contains the Infrastructure as Code as CloudFormation templates.
-- Currently only contains automation for Cognito deployment.
+- A master / parent template exists, whose sole purpose is to deploy nested templates.
+- In the current configuration, templates must be saved in the S3 bucket `studybuddy-templates`.
   
-Deploy Cognito:
+    Deploy master template:
 
-`aws cloudformation deploy --template-file cfn-nested-cognito.yaml --stack-name cfn-cognito`
+    `aws cloudformation deploy --template-file cfn-master.yaml --stack-name cfn-studybuddy-master-dev`
 
 
 ### /CodePipeline
