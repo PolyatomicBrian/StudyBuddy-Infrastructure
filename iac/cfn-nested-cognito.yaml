@@ -109,7 +109,7 @@ Resources:
     Type: AWS::Cognito::UserPoolIdentityProvider
     Properties: 
       AttributeMapping:
-        email: emailAddress
+        email: email
       ProviderDetails:
         client_id: !Sub "{{resolve:secretsmanager:${IdentityProviderGoogleClientId}}}"
         client_secret: !Sub "{{resolve:secretsmanager:${IdentityProviderGoogleClientSecret}}}"
