@@ -17,11 +17,13 @@ phases:
         - echo Deployment started.
         - cd ./APILambdas/
         - |
-          for dirname in ./
+          for dirname in */
           do
             dirname=${dirname%*/}
-            zip ${dirname}.zip $dirname/*
-            aws lambda update-function-code --function-name $dirname --zip-file ${dirname}.zip
+            cd $dirname
+            zip -r ${dirname}.zip *
+            aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip
+            cd ../
           done;
         - echo Deployment complete.
         
