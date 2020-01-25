@@ -1,0 +1,27 @@
+# buildspec-api.yml
+# Brian Jopling, Jan 2020
+#
+# Deploys code from GitHub to AWS Lambda.
+# Prerequisites: CodeBuild running amazon-linux-2 AMI 2.0
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+        python: 3.8
+    commands:
+        - echo Starting...
+  build:
+    commands:
+        - echo Deployment started.
+        - cd ./APILambdas/
+        - |
+          for dirname in ./
+          do
+            dirname=${dirname%*/}
+            zip ${dirname}.zip $dirname/*
+            aws lambda update-function-code --function-name $dirname --zip-file ${dirname}.zip
+          done;
+        - echo Deployment complete.
+        
