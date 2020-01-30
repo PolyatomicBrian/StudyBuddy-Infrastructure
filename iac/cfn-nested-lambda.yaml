@@ -1,0 +1,293 @@
+# cfn-nested-lambda.yaml
+# Author: Brian Jopling, Jan 2020
+#
+# Description:
+#   Deploys Lambda functions used by Study Buddy. Most Lambdas back the API.
+#
+#
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for creating Lambda functions.
+
+Parameters:
+  S3ArtifactsBucket:
+    Type: String
+    Default: studybuddy-cicd-pipeline
+    Description: Bucket containing the Lambda source code.
+  S3ArtifactsPath:
+    Type: String
+    Default: studybuddy-backend
+    Description: Directory path to Lambda source code.
+  RoleLambdaDatabaseExecution:
+    Type: String
+    Default: LambdaDatabaseExecution
+  EnvVarDbName:
+    Type: String
+    Default: buddy
+  EnvVarDbPassword:
+    Type: String
+    Default: TODO
+  EnvVarDbUrl:
+    Type: String
+    Default: db.dev-snapshot.somethingcode.com
+  EnvVarDbUser:
+    Type: String
+    Default: admin
+
+Resources:
+  LambdaDeleteStudent:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/deleteStudent.zip"
+      FunctionName: deleteStudent
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaAskQuestion:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/askQuestion.zip"
+      FunctionName: askQuestion
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaChunkTextbook:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/chunkTextbook.zip"
+      FunctionName: chunkTextbook
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaClassifyChunk:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/classifyChunk.zip"
+      FunctionName: classifyChunk
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          CLASSIFICATION_COUNT: "3"
+          ENDPOINT_NAME: chunk-classifier
+
+  LambdaCreateStudent:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/createStudent.zip"
+      FunctionName: createStudent
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaDeleteBook:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/deleteBook.zip"
+      FunctionName: deleteBook
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaEditBook:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/editBook.zip"
+      FunctionName: editBook
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaGetConversation:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/getConversation.zip"
+      FunctionName: getConversation
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaGetConversations:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/getConversations.zip"
+      FunctionName: getConversations
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaLibrary:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/library.zip"
+      FunctionName: library
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaRateResponse:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/rateResponse.zip"
+      FunctionName: rateResponse
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaUpdateStudent:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/updateStudent.zip"
+      FunctionName: updateStudent
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+
+  LambdaUpload:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/upload.zip"
+      FunctionName: upload
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !Ref RoleLambdaDatabaseExecution
+      Runtime: python3.8
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Ref EnvVarDbName
+          db_password: !Ref EnvVarDbPassword
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Ref EnvVarDbUser
+          
+          
+          
+          
+          
+          
+          
+          
+          
+                  
+
+  

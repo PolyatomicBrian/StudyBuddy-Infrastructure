@@ -1,0 +1,44 @@
+# cfn-master.yaml
+# Author: Brian Jopling, Jan 2020
+#
+# Description:
+#   Deploys components required for the API Gateway; namely
+#   the Gateway itself and the stages.
+#
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for creating API Gateway infra.
+
+Parameters:
+  S3OpenApiSpecBucket:
+    Type: String
+    Default: studybuddy-cicd-pipeline
+    Description: Name of S3 bucket containing the OpenAPI Specification.
+  S3PathToOpenApiSpec:
+    Type: String
+    Default: api-openapi.yaml
+
+
+Resources:
+  RestApiStudyBuddyBackend:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+        BodyS3Location:
+          Bucket: !Ref S3OpenApiSpecBucket
+          Key: !Ref S3PathToOpenApiSpec 
+        Name: StudyBuddyBackend
+
+  DeploymentStudyBuddyBackend:
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref RestApiStudyBuddyBackend
+      Description: Deployment of RestApi mapping.
+      StageName: v1
+  
+  StageStudyBuddyBackend:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: v1
+      RestApiId: !Ref RestApiStudyBuddyBackend
+      DeploymentId: !Ref DeploymentStudyBuddyBackend

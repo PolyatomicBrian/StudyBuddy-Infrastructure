@@ -16,10 +16,27 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Master template for creating all StudyBuddy infra.
 
-Resources:
+Parameters:
+  S3InfrastructureBucket:
+    Type: String
+    Default: studybuddy-templates
+    Description: S3 bucket containing all the CloudFormation templates & OpenAPI Spec.
 
+Resources:
   NestedStackCognito:
     Type: AWS::CloudFormation::Stack
     Properties: 
-      TemplateURL: https://studybuddy-templates.s3.amazonaws.com/cfn-nested-cognito.yaml
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
       TimeoutInMinutes: 60
+
+  NestedStackLambda:
+    Type: AWS::CloudFormation::Stack
+    Properties: 
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
+      TimeoutInMinutes: 20
+
+  NestedStackApiGateway:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-apigw.yaml"
+      TimeoutInMinutes: 10
