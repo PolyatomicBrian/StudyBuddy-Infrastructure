@@ -1,0 +1,218 @@
+# cfn-nested-cicd.yaml
+# Author: Brian Jopling, Jan 2020
+#
+# Description:
+#   Deploys components required for frontend and backend CICD; namely the
+#   CodePipeline, CodeBuild, and CodeDeploy resources.
+#
+# Pre-requisite: GitHub token must be stored in SecretsManager.
+#
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for CICD Pipeline deployment.
+
+Parameters:
+
+  S3ArtifactsBucket:
+    Type: String
+    Default: studybuddy-testing-cicd #studybuddy-cicd-pipeline
+    Description: Bucket containing the Lambda source code.
+  S3FrontendDeployBucket:
+    Type: String
+    Default: studybuddy-testing-host #www.dev-snapshot.somethingcode.com
+    Description: Bucket that hosts the frontend web files.
+
+  GitHubUserName:
+    Type: String
+    Default: Chudly63
+  GitHubFrontendRepo:
+    Type: String
+    Default: StudyBuddy-FrontEnd
+  GitHubBranch:
+    Type: String
+    Default: development
+  GitHubToken:
+    Type: String
+    Default: "cicd-github-access:SecretString:token"
+    Description: GitHub token must be stored in SecretsManager.
+
+Resources:
+
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: codepipeline-service
+        PolicyDocument:
+          Statement:
+          - Action:
+            - codebuild:*
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:GetBucketVersioning
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - s3:PutObject
+            Resource:
+            - arn:aws:s3:::codepipeline*
+            Effect: Allow
+          - Action:
+            - s3:*
+            - cloudformation:*
+            - iam:PassRole
+            Resource: "*"
+            Effect: Allow
+          Version: '2012-10-17'
+
+  FrontendCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: frontend-pipeline
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Version: '1'
+            Provider: GitHub
+          OutputArtifacts:
+          - Name: SourceOutput
+          Configuration:
+            Owner: !Ref GitHubUserName
+            Repo: !Ref GitHubFrontendRepo
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Sub "{{resolve:secretsmanager:${GitHubToken}}}"
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          InputArtifacts:
+          - Name: SourceOutput
+          OutputArtifacts:
+          - Name: DeployOutput
+          Configuration:
+            ProjectName: !Ref FrontendCodeBuildProject
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: S3
+          InputArtifacts:
+          - Name: DeployOutput
+          Configuration:
+            BucketName: !Ref S3FrontendDeployBucket
+            Extract: true
+          RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3ArtifactsBucket
+
+  FrontendCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: !Sub |
+          version: 0.2
+          env:
+            variables:
+              CACHE_CONTROL: "86400"
+              S3_BUCKET: "${S3FrontendDeployBucket}"
+              BUILD_FOLDER: "dist"
+          phases:
+            install:
+              runtime-versions:
+                nodejs: 10
+              commands:
+              - echo Installing source NPM dependencies...
+              - npm install
+              - npm install -g @angular/cli
+            build:
+              commands:
+              - echo Build started 
+              - ng build --prod
+          artifacts:
+            files:
+            - '**/*'
+            base-directory: 'dist*'
+            discard-paths: yes
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:2.0
+        Type: LINUX_CONTAINER
+      Name: "FrontEnd-Angular-CodeBuild"
+      ServiceRole:
+        Fn::GetAtt:
+        - CodeBuildRole
+        - Arn
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CodeBuildRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+  BuildProjectPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CodeBuildPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketPolicy
+              - s3:GetObject
+              - s3:ListBucket
+            Resource:
+             - !Join ['',['arn:aws:s3:::',!Ref S3ArtifactsBucket, '/*']]
+             - !Join ['',['arn:aws:s3:::',!Ref S3ArtifactsBucket]]
+          -
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+      Roles:
+        -
+          !Ref CodeBuildRole
