@@ -15,11 +15,11 @@ Parameters:
 
   S3ArtifactsBucket:
     Type: String
-    Default: studybuddy-testing-cicd #studybuddy-cicd-pipeline
+    Default: studybuddy-cicd-pipeline
     Description: Bucket containing the Lambda source code.
   S3FrontendDeployBucket:
     Type: String
-    Default: studybuddy-testing-host #www.dev-snapshot.somethingcode.com
+    Default: www.somethingcode.com
     Description: Bucket that hosts the frontend web files.
 
   GitHubUserName:
@@ -33,16 +33,22 @@ Parameters:
     Default: StudyBuddy-BackEnd
   GitHubBranch:
     Type: String
-    Default: development
+    Default: master
   GitHubToken:
     Type: String
     Default: "cicd-github-access:SecretString:token"
     Description: GitHub token must be stored in SecretsManager.
 
-Conditions:
-  NoFrontend: !Equals ["x", "y"]  # Clear false case
-
 Resources:
+
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3ArtifactsBucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
 
   CodePipelineRole:
     Type: AWS::IAM::Role
@@ -85,7 +91,6 @@ Resources:
 
   FrontendCodePipeline:
     Type: AWS::CodePipeline::Pipeline
-    #Condition: NoFrontend
     Properties:
       Name: frontend-pipeline
       RoleArn: !GetAtt CodePipelineRole.Arn
@@ -220,6 +225,12 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: arn:aws:logs:*:*:*
+          -
+            Effect: Allow
+            Action:
+              - lambda:UpdateFunctionCode
+              - lambda:UpdateFunctionConfiguration
+            Resource: arn:aws:lambda:*:*:function:*
       Roles:
         -
           !Ref CodeBuildRole
@@ -292,13 +303,14 @@ Resources:
                       dirname=${dirname%*/}
                       cd $dirname
                       zip -r ${dirname}.zip *
+                      aws lambda update-function-configuration --function-name ${dirname} --runtime python3.8
                       aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip
                       cd ../
                     done;
                   - echo Deployment complete.
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:2.0
+        Image: aws/codebuild/standard:3.0
         Type: LINUX_CONTAINER
       Name: "Backend-CodeBuild"
       ServiceRole:
