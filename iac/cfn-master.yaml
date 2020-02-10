@@ -5,10 +5,11 @@
 #   Deploys nested templates to automate the creation of all infrastructure
 #   required by StudyBuddy.
 #
-# Usage: - Manual validation of ACM cert must be done during the deployment process.
-#           Otherwise, the stack will hang. (TODO, automate)
+# Usage: - Manual validation of ACM certs must be done during the deployment process.
+#           Otherwise, the stack will hang. (Two certs, one for Cognito, one for Frontend.)
 #        - Upon completion of deployment, an Alias record must be created to point
-#           the custom domain url to the CloudFront distribution of the Hosted UI. (TODO, automate)
+#           the custom domain url to the CloudFront distribution. (Two urls, one for 
+#           Cognito, one for Frontend.)
 #
 # Pre-requisites: Google Client ID and Client Secret must be stored in SecretsManager before deploying.
 #
@@ -27,16 +28,22 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties: 
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
-      TimeoutInMinutes: 60
+      TimeoutInMinutes: 10
 
   NestedStackLambda:
     Type: AWS::CloudFormation::Stack
     Properties: 
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
-      TimeoutInMinutes: 20
+      TimeoutInMinutes: 10
 
   NestedStackApiGateway:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-apigw.yaml"
+      TimeoutInMinutes: 10
+  
+  NestedStackFrontend:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
       TimeoutInMinutes: 10

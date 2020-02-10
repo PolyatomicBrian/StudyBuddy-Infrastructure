@@ -28,6 +28,9 @@ Parameters:
   GitHubFrontendRepo:
     Type: String
     Default: StudyBuddy-FrontEnd
+  GitHubBackendRepo:
+    Type: String
+    Default: StudyBuddy-BackEnd
   GitHubBranch:
     Type: String
     Default: development
@@ -35,6 +38,9 @@ Parameters:
     Type: String
     Default: "cicd-github-access:SecretString:token"
     Description: GitHub token must be stored in SecretsManager.
+
+Conditions:
+  NoFrontend: !Equals ["x", "y"]  # Clear false case
 
 Resources:
 
@@ -79,6 +85,7 @@ Resources:
 
   FrontendCodePipeline:
     Type: AWS::CodePipeline::Pipeline
+    #Condition: NoFrontend
     Properties:
       Name: frontend-pipeline
       RoleArn: !GetAtt CodePipelineRole.Arn
@@ -216,3 +223,85 @@ Resources:
       Roles:
         -
           !Ref CodeBuildRole
+
+  BackendCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: backend-pipeline
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Version: '1'
+            Provider: GitHub
+          OutputArtifacts:
+          - Name: SourceBackendOutput
+          Configuration:
+            Owner: !Ref GitHubUserName
+            Repo: !Ref GitHubBackendRepo
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Sub "{{resolve:secretsmanager:${GitHubToken}}}"
+          RunOrder: 1
+      - Name: Build
+        Actions:
+        - Name: Build
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          InputArtifacts:
+          - Name: SourceBackendOutput
+          OutputArtifacts:
+          - Name: DeployBackendOutput
+          Configuration:
+            ProjectName: !Ref BackendCodeBuildProject
+          RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3ArtifactsBucket
+
+  BackendCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: |
+          version: 0.2
+
+          phases:
+            install:
+              runtime-versions:
+                  python: 3.8
+              commands:
+                  - echo Starting...
+            build:
+              commands:
+                  - echo Deployment started.
+                  - cd ./APILambdas/
+                  - |
+                    for dirname in */
+                    do
+                      dirname=${dirname%*/}
+                      cd $dirname
+                      zip -r ${dirname}.zip *
+                      aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip
+                      cd ../
+                    done;
+                  - echo Deployment complete.
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:2.0
+        Type: LINUX_CONTAINER
+      Name: "Backend-CodeBuild"
+      ServiceRole:
+        Fn::GetAtt:
+        - CodeBuildRole
+        - Arn
