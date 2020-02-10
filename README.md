@@ -1,6 +1,9 @@
 # Study Buddy Infrastructure
 
+Copyright © 2020 SomethingCode
+
 Brian Jopling, 2019 - 2020
+
 
 ## Purpose
 

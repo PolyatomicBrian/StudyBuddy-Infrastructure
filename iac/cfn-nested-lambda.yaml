@@ -10,6 +10,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Nested template for creating Lambda functions.
 
 Parameters:
+  S3InfrastructureBucket:
+    Type: String
+    Default: studybuddy-templates
+    Description: S3 bucket containing all the CloudFormation templates & OpenAPI Spec.
   S3ArtifactsBucket:
     Type: String
     Default: studybuddy-cicd-pipeline
@@ -18,23 +22,50 @@ Parameters:
     Type: String
     Default: studybuddy-backend
     Description: Directory path to Lambda source code.
-  RoleLambdaDatabaseExecution:
-    Type: String
-    Default: LambdaDatabaseExecution
   EnvVarDbName:
     Type: String
-    Default: buddy
+    Description: "DB name must be stored in SecretsManager. Provide the key name here."
+    Default: "dev-snapshot-db-cred:SecretString:dbInstanceIdentifier"
   EnvVarDbPassword:
     Type: String
-    Default: TODO
+    Description: "DB password must be stored in SecretsManager. Provide the key name here."
+    Default: "dev-snapshot-db-cred:SecretString:password"
   EnvVarDbUrl:
     Type: String
-    Default: db.dev-snapshot.somethingcode.com
+    Description: "DB url must be stored in SecretsManager. Provide the key name here."
+    Default: "dev-snapshot-db-cred:SecretString:host"
   EnvVarDbUser:
     Type: String
-    Default: admin
+    Description: "DB username must be stored in SecretsManager. Provide the key name here."
+    Default: "dev-snapshot-db-cred:SecretString:username"
 
 Resources:
+
+  RoleLambdaExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+  LambdaPyLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties: 
+      CompatibleRuntimes: 
+        - python3.8
+      Content: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: !Sub "${S3ArtifactsPath}/pyLayer.zip"
+      LayerName: PythonLambdaLayer
+
   LambdaDeleteStudent:
     Type: AWS::Lambda::Function
     Properties: 
@@ -43,16 +74,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/deleteStudent.zip"
       FunctionName: deleteStudent
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaAskQuestion:
     Type: AWS::Lambda::Function
@@ -62,16 +95,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/askQuestion.zip"
       FunctionName: askQuestion
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaChunkTextbook:
     Type: AWS::Lambda::Function
@@ -81,16 +116,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/chunkTextbook.zip"
       FunctionName: chunkTextbook
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaClassifyChunk:
     Type: AWS::Lambda::Function
@@ -100,8 +137,10 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/classifyChunk.zip"
       FunctionName: classifyChunk
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
@@ -117,16 +156,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/createStudent.zip"
       FunctionName: createStudent
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaDeleteBook:
     Type: AWS::Lambda::Function
@@ -136,16 +177,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/deleteBook.zip"
       FunctionName: deleteBook
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaEditBook:
     Type: AWS::Lambda::Function
@@ -155,16 +198,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/editBook.zip"
       FunctionName: editBook
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaGetConversation:
     Type: AWS::Lambda::Function
@@ -174,16 +219,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/getConversation.zip"
       FunctionName: getConversation
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaGetConversations:
     Type: AWS::Lambda::Function
@@ -193,16 +240,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/getConversations.zip"
       FunctionName: getConversations
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaLibrary:
     Type: AWS::Lambda::Function
@@ -212,16 +261,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/library.zip"
       FunctionName: library
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaRateResponse:
     Type: AWS::Lambda::Function
@@ -231,16 +282,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/rateResponse.zip"
       FunctionName: rateResponse
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaUpdateStudent:
     Type: AWS::Lambda::Function
@@ -250,16 +303,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/updateStudent.zip"
       FunctionName: updateStudent
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaUpload:
     Type: AWS::Lambda::Function
@@ -269,16 +324,18 @@ Resources:
         S3Key: !Sub "${S3ArtifactsPath}/upload.zip"
       FunctionName: upload
       Handler: "lambda_function.lambda_handler"
+      Layers:
+      - !Ref LambdaPyLayer
       MemorySize: 128
-      Role: !Ref RoleLambdaDatabaseExecution
+      Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Ref EnvVarDbName
-          db_password: !Ref EnvVarDbPassword
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Ref EnvVarDbUser
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
           
           
           

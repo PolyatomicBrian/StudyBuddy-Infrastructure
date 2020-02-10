@@ -13,32 +13,66 @@ Description: Nested template for creating API Gateway infra.
 Parameters:
   S3OpenApiSpecBucket:
     Type: String
-    Default: studybuddy-cicd-pipeline
+    Default: studybuddy-templates
     Description: Name of S3 bucket containing the OpenAPI Specification.
   S3PathToOpenApiSpec:
     Type: String
     Default: api-openapi.yaml
+  StageName:
+    Type: String
+    Default: v1
 
 
 Resources:
+
+  # IAM Role to allow API GW to invoke its Lambda functions.
+  RoleApiGwInvokeLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: InvokeLambda
+        PolicyDocument:
+          Statement:
+          - Action:
+            - lambda:InvokeFunction
+            Resource: "*"
+            Effect: Allow
+          Version: '2012-10-17'
+
+  # Mapping for API GW
   RestApiStudyBuddyBackend:
     Type: AWS::ApiGateway::RestApi
     Properties:
-        BodyS3Location:
-          Bucket: !Ref S3OpenApiSpecBucket
-          Key: !Ref S3PathToOpenApiSpec 
+        Body:
+          'Fn::Transform':
+            Name: 'AWS::Include'
+            Parameters:
+              Location: !Sub "s3://${S3OpenApiSpecBucket}/${S3PathToOpenApiSpec}"
         Name: StudyBuddyBackend
 
+  # Stage (snapshot) of API GW mapping and configuration
+  StageStudyBuddyBackend:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: !Ref StageName
+      RestApiId: !Ref RestApiStudyBuddyBackend
+      DeploymentId: !Ref DeploymentStudyBuddyBackend
+
+  # Actual deployment of stage.
   DeploymentStudyBuddyBackend:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref RestApiStudyBuddyBackend
       Description: Deployment of RestApi mapping.
-      StageName: v1
+      StageName: !Ref StageName
   
-  StageStudyBuddyBackend:
-    Type: AWS::ApiGateway::Stage
-    Properties:
-      StageName: v1
-      RestApiId: !Ref RestApiStudyBuddyBackend
-      DeploymentId: !Ref DeploymentStudyBuddyBackend
+
