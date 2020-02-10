@@ -1,9 +1,9 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-01-27T21:44:47Z"
+  version: "2020-02-10T03:26:56Z"
   title: "StudyBuddy"
-basePath: "/dev"
+host: "www.api-dev.somethingcode.com"
 schemes:
 - "https"
 paths:
@@ -19,6 +19,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:askQuestion/invocations"
         responses:
@@ -157,6 +159,8 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:getConversation/invocations"
         responses:
@@ -214,6 +218,8 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:askQuestion/invocations"
         responses:
@@ -256,6 +262,60 @@ paths:
         requestTemplates:
           application/json: "{\"statusCode\": 200}"
         type: "mock"
+  /conversation/{conversation-id}/users:
+    put:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "conversation-id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - Cognito: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:add_user/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        type: "mock"
   /createstudent:
     post:
       produces:
@@ -268,6 +328,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:createStudent/invocations"
         responses:
@@ -320,6 +382,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:deleteBook/invocations"
         responses:
@@ -372,6 +436,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:deleteStudent/invocations"
         responses:
@@ -436,8 +502,6 @@ paths:
         responses:
           default:
             statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'*'"
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
@@ -473,8 +537,6 @@ paths:
         type: "mock"
   /exchange:
     post:
-      consumes:
-      - "application/json"
       produces:
       - "application/json"
       responses:
@@ -494,8 +556,6 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n    \"code\": \"$input.params('code')\"\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -543,6 +603,8 @@ paths:
               type: "string"
             Server-Timing:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:getConversation/invocations"
         responses:
@@ -554,8 +616,8 @@ paths:
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
         requestTemplates:
-          application/json: "{\n    \"user_id\": \"$input.params('user_id')\",\n \
-            \   \"conversation_id\": \"$input.params('conversation_id')\"\n}"
+          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
+            ,\n    \"conversation_id\": \"$input.params('conversation_id')\"\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     post:
@@ -569,6 +631,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:getConversation/invocations"
         responses:
@@ -623,6 +687,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:getConversations/invocations"
         responses:
@@ -679,6 +745,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:library/invocations"
         responses:
@@ -773,6 +841,110 @@ paths:
         requestTemplates:
           application/json: "{\"statusCode\": 200}"
         type: "mock"
+  /presign:
+    get:
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:upload/invocations"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        type: "mock"
+  /process:
+    post:
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:chunkTextbook/invocations"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        type: "mock"
   /rateresponse:
     post:
       produces:
@@ -785,6 +957,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:rateresponse/invocations"
         responses:
@@ -837,6 +1011,8 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:signup/invocations"
         responses:
@@ -889,60 +1065,10 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:updateStudent/invocations"
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        contentHandling: "CONVERT_TO_TEXT"
-        type: "aws"
-    options:
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
-          headers:
-            Access-Control-Allow-Origin:
-              type: "string"
-            Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Headers:
-              type: "string"
-      x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
-        type: "mock"
-  /upload:
-    post:
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
-          headers:
-            Access-Control-Allow-Origin:
-              type: "string"
-      x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:846384842425:function:upload/invocations"
         responses:
           default:
             statusCode: "200"
