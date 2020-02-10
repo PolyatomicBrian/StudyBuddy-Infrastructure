@@ -1,0 +1,106 @@
+# cfn-nested-frontend.yaml
+# Author: Brian Jopling, Feb 2020
+#
+# Description:
+#   Deploys components required for frontend web hosting; namely the
+#   S3 Web Hosting Bucket and CloudFront resources.
+#
+# Usage: - Manual validation of ACM cert must be done during the deployment process.
+#           Otherwise, the stack will hang.
+#        - Upon completion of deployment, an Alias record must be created to point
+#           the custom domain url to the CloudFront distribution.
+#
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for Frontend deployment.
+
+Parameters:
+
+  S3FrontendDeployBucket:
+    Type: String
+    Default: www.somethingcode.com
+    Description: Bucket that hosts the frontend web files.
+
+  URLFrontend:
+    Type: String
+    Default: "www.somethingcode.com"
+
+Resources:
+
+  Cert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref URLFrontend
+      DomainValidationOptions:
+        - DomainName: !Ref URLFrontend
+          ValidationDomain: !Ref URLFrontend
+      ValidationMethod: DNS
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref URLFrontend
+        DefaultCacheBehavior:
+          Compress: true
+          ForwardedValues:
+            QueryString: false
+          TargetOriginId: !Ref S3FrontendDeployBucket
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 300
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 300
+            ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        Enabled: true
+        HttpVersion: http2
+        Origins:
+          - DomainName: !Join ['', [!Ref Bucket, '.s3.amazonaws.com']]
+            Id: !Ref S3FrontendDeployBucket
+            S3OriginConfig:
+              OriginAccessIdentity:
+                !Join ['', ['origin-access-identity/cloudfront/', !Ref CloudFrontOriginAccessIdentity]]
+        ViewerCertificate:
+          AcmCertificateArn: !Ref Cert
+          MinimumProtocolVersion: TLSv1.2_2018
+          SslSupportMethod: sni-only
+      Tags:
+        - Key: Domain
+          Value: !Ref URLFrontend
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'CloudFront OAI for ${URLFrontend}'
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3FrontendDeployBucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Domain
+          Value: !Ref URLFrontend
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+            Effect: Allow
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref Bucket, '/*']]
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
