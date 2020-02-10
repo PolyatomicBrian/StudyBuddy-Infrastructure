@@ -39,9 +39,6 @@ Parameters:
     Default: "cicd-github-access:SecretString:token"
     Description: GitHub token must be stored in SecretsManager.
 
-Conditions:
-  Dont: !Equals ["x", "y"]
-
 Resources:
 
   ArtifactsBucket:
@@ -94,7 +91,6 @@ Resources:
 
   FrontendCodePipeline:
     Type: AWS::CodePipeline::Pipeline
-    Condition: Dont
     Properties:
       Name: frontend-pipeline
       RoleArn: !GetAtt CodePipelineRole.Arn
