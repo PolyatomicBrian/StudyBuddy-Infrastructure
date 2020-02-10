@@ -13,7 +13,7 @@ Description: Nested template for creating API Gateway infra.
 Parameters:
   S3OpenApiSpecBucket:
     Type: String
-    Default: studybuddy-templates
+    Default: studybuddy-cfn-templates
     Description: Name of S3 bucket containing the OpenAPI Specification.
   S3PathToOpenApiSpec:
     Type: String

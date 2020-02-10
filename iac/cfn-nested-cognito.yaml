@@ -25,13 +25,13 @@ Parameters:
     Default: "Welcome to StudyBuddy"
   ClientCallbackUrl:
     Type: String
-    Default: "https://www.dev-snapshot.somethingcode.com"
+    Default: "https://www.somethingcode.com"
   LogoutUrl:
     Type: String
-    Default: "https://www.dev-snapshot.somethingcode.com/logout"
+    Default: "https://www.somethingcode.com/logout"
   HostedUserPoolDomainName:
     Type: String
-    Default: "signin-dev.somethingcode.com"
+    Default: "signin.somethingcode.com"
   IdentityProviderGoogleClientId:
     Type: String
     Description: "Client ID must be stored in SecretsManager. Provide the key name here."
@@ -50,7 +50,7 @@ Resources:
       AutoVerifiedAttributes: 
         - email
       EmailConfiguration: 
-        EmailSendingAccount: COGNITO_DEFAULT  # TODO, replace with SES
+        EmailSendingAccount: COGNITO_DEFAULT 
       EmailVerificationMessage: !Ref EmailVerificationMessage
       EmailVerificationSubject: !Ref EmailVerificationSubject
       Schema:
