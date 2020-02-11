@@ -14,6 +14,8 @@
 #   Updates the existing OpenAPI file with parameters.
 #   Also generates a backup of the original file contents.
 #
+# Note: Account ID passed as arg should match the account ID in 
+#       which the OpenAPI spec was originally exported from.
 
 FILE=$1
 ACCOUNT_ID=$2
@@ -39,8 +41,10 @@ if [ -z $ACCOUNT_ID ]
 fi
 
 cp $FILE $BKUPFILE
-gsed -i '6,7d' $FILE
+gsed -i '6,8d' $FILE
 gsed -i s/us-east-1/'${AWS::Region}'/g $FILE
-gsed -i s/$ACCOUNT_ID/'${AWS::AccountId}'/g $FILE
+gsed -i s/us-east-2/'${AWS::Region}'/g $FILE
+gsed -i s/${ACCOUNT_ID}/'${AWS::AccountId}'/g $FILE
 gsed -i s/'^\(\s\+\)uri:'/'\1uri:\n\1  Fn::Sub:'/g $FILE
 gsed -i s,'^\(\s\+\)passthroughBehavior','\1credentials:\n\1  Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"\n\1passthroughBehavior',g $FILE
+gsed -i s,'"arn:aws:cognito-idp:.*:userpool/.*"','Fn::Sub "${CognitoUserPoolArn}"',g $FILE
