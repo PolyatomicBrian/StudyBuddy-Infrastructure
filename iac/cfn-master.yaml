@@ -25,10 +25,10 @@ Parameters:
 
 Resources:
   NestedStackCognito:
-    Type: AWS::CloudFormation::Stack
-    Properties: 
-      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
-      TimeoutInMinutes: 25
+   Type: AWS::CloudFormation::Stack
+   Properties: 
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
+     TimeoutInMinutes: 25
 
   NestedStackLambda:
     Type: AWS::CloudFormation::Stack
@@ -44,17 +44,17 @@ Resources:
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-apigw.yaml"
       TimeoutInMinutes: 10
   
-  #NestedStackFrontend:
-  #  Type: AWS::CloudFormation::Stack
-  #  Properties:
-  #    TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
-  #    TimeoutInMinutes: 30
+  NestedStackFrontend:
+   Type: AWS::CloudFormation::Stack
+   Properties:
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
+     TimeoutInMinutes: 60
   
-  #NestedStackCICD:
-  #  Type: AWS::CloudFormation::Stack
-  #  DependsOn: 
-  #  - NestedStackFrontend
-  #  - NestedStackLambda
-  #  Properties:
-  #    TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
-  #    TimeoutInMinutes: 20
+  NestedStackCICD:
+   Type: AWS::CloudFormation::Stack
+   DependsOn: 
+   - NestedStackFrontend
+   - NestedStackLambda
+   Properties:
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
+     TimeoutInMinutes: 20
