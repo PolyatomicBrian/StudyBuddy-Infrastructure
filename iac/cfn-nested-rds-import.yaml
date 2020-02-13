@@ -65,10 +65,10 @@ Resources:
       Name: "RDS-InitSchema-CodeBuild"
       ServiceRole:
         Fn::GetAtt:
-        - CodeBuildRole
+        - CodeBuildSQLImportRole
         - Arn
 
-  CodeBuildRole:
+  CodeBuildSQLImportRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: CodeBuildSqlImportRole
@@ -107,7 +107,7 @@ Resources:
             Resource: arn:aws:logs:*:*:*
       Roles:
         -
-          !Ref CodeBuildRole
+          !Ref CodeBuildSQLImportRole
 
   # Trigger CodeBuild so it runs its script to populate the MySQL db.
   LambdaInvokeCodeBuild:
@@ -172,10 +172,7 @@ Resources:
           -
             Effect: Allow
             Action:
-              - s3:PutObject
-              - s3:GetBucketPolicy
-              - s3:GetObject
-              - s3:ListBucket
+              - codebuild:StartBuild
             Resource:
              - !GetAtt RDSCodeBuildProject.Arn
           -
