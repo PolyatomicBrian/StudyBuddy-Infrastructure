@@ -116,11 +116,12 @@ Resources:
       Code: 
         ZipFile: !Sub |
           import boto3
+          import cfnresponse
 
           def lambda_handler( event, context ):
 
             if event['RequestType'] == 'Delete':
-              return 'Success'
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {"status": "success"})
             
             cb = boto3.client( 'codebuild' )
 
@@ -132,7 +133,7 @@ Resources:
             cb.start_build( **build )
             print( 'Successfully launched build.' )
 
-            return 'Success.'
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {"status": "success"})
       FunctionName: invokeCodeBuild
       Handler: "index.lambda_handler"
       MemorySize: 128
