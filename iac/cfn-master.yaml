@@ -25,35 +25,57 @@ Parameters:
 
 Resources:
   NestedStackCognito:
+   Type: AWS::CloudFormation::Stack
+   Properties: 
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
+     TimeoutInMinutes: 30
+
+  NestedStackRDS:
     Type: AWS::CloudFormation::Stack
     Properties: 
-      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
-      TimeoutInMinutes: 20
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-rds.yaml"
+      TimeoutInMinutes: 35
 
   NestedStackLambda:
     Type: AWS::CloudFormation::Stack
     Properties: 
+      Parameters:
+        EnvVarDbUrl: !GetAtt NestedStackRDS.Outputs.RDSApplicationUrl
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 
   NestedStackApiGateway:
     Type: AWS::CloudFormation::Stack
-    DependsOn: NestedStackCognito
     Properties:
+      Parameters: 
+        CognitoUserPoolArn: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolArn
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-apigw.yaml"
       TimeoutInMinutes: 10
   
   NestedStackFrontend:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
-      TimeoutInMinutes: 10
+   Type: AWS::CloudFormation::Stack
+   Properties:
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
+     TimeoutInMinutes: 60
   
   NestedStackCICD:
+   Type: AWS::CloudFormation::Stack
+   DependsOn: 
+   - NestedStackFrontend
+   - NestedStackLambda
+   Properties:
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
+     TimeoutInMinutes: 25
+
+  # Needs to be created after CICD Pipelines.
+  # The Backend CICD Pipeline pulls in the backend code from GitHub,
+  # which includes the sqldump. The sqldump is imported into the RDS.
+  NestedStackRDSImport:
     Type: AWS::CloudFormation::Stack
-    DependsOn: 
-    - NestedStackFrontend
-    - NestedStackLambda
-    Properties:
-      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
-      TimeoutInMinutes: 15
+    DependsOn:
+    - NestedStackCICD
+    Properties: 
+      Parameters:
+        RDSEndpointAddress: !GetAtt NestedStackRDS.Outputs.RDSApplicationUrl
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-rds-import.yaml"
+      TimeoutInMinutes: 25
