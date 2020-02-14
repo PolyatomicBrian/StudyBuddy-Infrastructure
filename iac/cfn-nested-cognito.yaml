@@ -126,3 +126,5 @@ Resources:
 Outputs:
   CognitoHostedSigninUrl: 
     Value: !Ref HostedUserPoolDomainName
+  CognitoUserPoolArn:
+    Value: !GetAtt CognitoUserPool.Arn
