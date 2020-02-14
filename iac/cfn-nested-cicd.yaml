@@ -258,6 +258,20 @@ Resources:
             Branch: !Ref GitHubBranch
             OAuthToken: !Sub "{{resolve:secretsmanager:${GitHubToken}}}"
           RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: S3
+          InputArtifacts:
+          - Name: SourceBackendOutput
+          Configuration:
+            BucketName: !Ref S3ArtifactsBucket
+            Extract: true
+          RunOrder: 1
       - Name: Build
         Actions:
         - Name: Build

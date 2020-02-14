@@ -18,14 +18,14 @@ Parameters:
     Type: String
     Description: "DB password must be stored in SecretsManager. Provide the key name here."
     Default: "db-credentials:SecretString:password"
-  EnvVarDbUrl:
-    Type: String
-    Description: "DB url must be stored in SecretsManager. Provide the key name here."
-    Default: "db-credentials:SecretString:host"
   EnvVarDbUser:
     Type: String
     Description: "DB username must be stored in SecretsManager. Provide the key name here."
     Default: "db-credentials:SecretString:username"
+  EnvVarDbUrl:
+    Type: String
+    Description: "DB url gets passed from RDS template."
+    Default: "placeholder"
 
 Resources:
 
@@ -61,7 +61,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaAskQuestion:
@@ -81,7 +81,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaChunkTextbook:
@@ -101,7 +101,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaClassifyChunk:
@@ -139,7 +139,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaDeleteBook:
@@ -159,7 +159,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaEditBook:
@@ -179,7 +179,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaGetConversation:
@@ -199,7 +199,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaGetConversations:
@@ -219,7 +219,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaLibrary:
@@ -239,7 +239,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaRateResponse:
@@ -259,7 +259,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaUpdateStudent:
@@ -279,7 +279,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaUpload:
@@ -299,7 +299,7 @@ Resources:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Sub "{{resolve:secretsmanager:${EnvVarDbUrl}}}"
+          db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
           
           
