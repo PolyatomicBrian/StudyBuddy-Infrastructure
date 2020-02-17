@@ -1,0 +1,47 @@
+# cfn-nested-sagemaker.yaml
+# Author: Brian Jopling, Feb 2020
+#
+# Description:
+#   Deploys components required for the Sagemaker; namely
+#   the notebook instance, the endpoint, and the model.
+#
+# Currently contains stub values; deployment will not work.
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for creating SageMaker infra.
+
+
+Resources:
+
+  SageMakerNotebookChunkClassifier:
+    Type: AWS::SageMaker::NotebookInstance
+    Properties: 
+      DefaultCodeRepository: String
+      DirectInternetAccess: Disabled
+      InstanceType: ml.t3.medium
+      NotebookInstanceName: ChunkClassifierNotebook
+      RoleArn: String
+      RootAccess: Disabled
+      VolumeSizeInGB: 5
+
+  SageMakerModelChunkClassifier:
+    Type: AWS::SageMaker::Model
+    Properties: 
+      Containers: 
+        - ContainerHostname: String
+          Environment: Json
+          Image: String
+          Mode: String
+          ModelDataUrl: String
+      ExecutionRoleArn: String
+      ModelName: ChunkClassifierModel
+
+  SageMakerEndpointChunkClassifier:
+    Type: AWS::SageMaker::Endpoint
+    Properties: 
+      EndpointConfigName: String
+      EndpointName: ChunkClassifierEndpoint
+      ExcludeRetainedVariantProperties: 
+        - VariantProperty
+      RetainAllVariantProperties: Boolean
