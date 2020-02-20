@@ -31,9 +31,12 @@ Parameters:
   GitHubBackendRepo:
     Type: String
     Default: StudyBuddy-BackEnd
-  GitHubBranch:
+  GitHubBranchFrontend:
     Type: String
     Default: master
+  GitHubBranchBackend:
+    Type: String
+    Default: development
   GitHubToken:
     Type: String
     Default: "cicd-github-access:SecretString:token"
@@ -109,7 +112,7 @@ Resources:
           Configuration:
             Owner: !Ref GitHubUserName
             Repo: !Ref GitHubFrontendRepo
-            Branch: !Ref GitHubBranch
+            Branch: !Ref GitHubBranchFrontend
             OAuthToken: !Sub "{{resolve:secretsmanager:${GitHubToken}}}"
           RunOrder: 1
       - Name: Build
@@ -255,10 +258,10 @@ Resources:
           Configuration:
             Owner: !Ref GitHubUserName
             Repo: !Ref GitHubBackendRepo
-            Branch: !Ref GitHubBranch
+            Branch: !Ref GitHubBranchBackend
             OAuthToken: !Sub "{{resolve:secretsmanager:${GitHubToken}}}"
           RunOrder: 1
-      - Name: Deploy
+      - Name: DeployGitHubToS3
         Actions:
         - Name: Deploy
           ActionTypeId:
@@ -286,6 +289,20 @@ Resources:
           - Name: DeployBackendOutput
           Configuration:
             ProjectName: !Ref BackendCodeBuildProject
+          RunOrder: 1
+      - Name: DeployZippedArtifacts
+        Actions:
+        - Name: Deploy
+          ActionTypeId:
+            Category: Deploy
+            Owner: AWS
+            Version: '1'
+            Provider: S3
+          InputArtifacts:
+          - Name: DeployBackendOutput
+          Configuration:
+            BucketName: !Ref S3ArtifactsBucket
+            Extract: true
           RunOrder: 1
       ArtifactStore:
         Type: S3
@@ -317,11 +334,14 @@ Resources:
                       dirname=${dirname%*/}
                       cd $dirname
                       zip -r ${dirname}.zip *
-                      aws lambda update-function-configuration --function-name ${dirname} --runtime python3.8
-                      aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip
                       cd ../
                     done;
                   - echo Deployment complete.
+          artifacts:
+            files:
+            - '**/*'
+            base-directory: 'APILambdas'
+            discard-paths: no
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:3.0

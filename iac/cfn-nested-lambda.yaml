@@ -26,6 +26,19 @@ Parameters:
     Type: String
     Description: "DB url gets passed from RDS template."
     Default: "placeholder"
+  SageMakerChunkClassifierEndpointName:
+    Type: String
+    Description: "SageMaker Endpoint for chunk classification passed from SageMaker template."
+    Default: "placeholder"
+  SageMakerQuestionClassifierEndpointName:
+    Type: String
+    Description: "SageMaker Endpoint for chunk classification passed from SageMaker template."
+    Default: "placeholder"
+  S3ArtifactsBucket:
+    Type: String
+    Default: studybuddy-cicd-pipeline
+    Description: Bucket containing the Lambda source code.
+
 
 Resources:
 
@@ -40,6 +53,14 @@ Resources:
             - lambda.amazonaws.com
           Action:
           - sts:AssumeRole
+      Policies:
+      - PolicyName: SageMakerInvocationPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - sagemaker:InvokeEndpoint
+            Resource: arn:aws:sagemaker:*:*:endpoint/*
+            Effect: Allow
       Path: "/"
       ManagedPolicyArns:
       - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -48,14 +69,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "deleteStudent/deleteStudent.zip"
       FunctionName: deleteStudent
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -68,14 +88,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "askQuestion/askQuestion.zip"
       FunctionName: askQuestion
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -88,14 +107,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "chunkTextbook/chunkTextbook.zip"
       FunctionName: chunkTextbook
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -108,32 +126,34 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "classifyChunk/classifyChunk.zip"
       FunctionName: classifyChunk
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
-          CLASSIFICATION_COUNT: "3"
-          ENDPOINT_NAME: chunk-classifier
+          CLASSIFICATION_COUNT: "1"
+          ENDPOINT_NAME: !Ref SageMakerChunkClassifierEndpointName
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
   LambdaCreateStudent:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "createStudent/createStudent.zip"
       FunctionName: createStudent
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -146,14 +166,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "deleteBook/deleteBook.zip"
       FunctionName: deleteBook
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -166,14 +185,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "editBook/editBook.zip"
       FunctionName: editBook
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -186,14 +204,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "getConversation/getConversation.zip"
       FunctionName: getConversation
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -206,14 +223,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "getConversations/getConversations.zip"
       FunctionName: getConversations
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -226,14 +242,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "library/library.zip"
       FunctionName: library
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -246,14 +261,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "rateresponse/rateresponse.zip"
       FunctionName: rateResponse
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -266,14 +280,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "updateStudent/updateStudent.zip"
       FunctionName: updateStudent
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
@@ -286,14 +299,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties: 
       Code: 
-        ZipFile: |
-          def lambda_handler():
-            print("Placeholder")
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "upload/upload.zip"
       FunctionName: upload
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 300
       Environment:
         Variables:
