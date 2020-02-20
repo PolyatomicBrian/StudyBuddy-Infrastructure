@@ -1,0 +1,60 @@
+# cfn-nested-frontend-s3.yaml
+# Author: Brian Jopling, Feb 2020
+#
+# Description:
+#   Deploys S3 components required for frontend web hosting; namely the
+#   S3 Web Hosting Bucket.
+#
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for Frontend deployment.
+
+Parameters:
+
+  S3FrontendDeployBucket:
+    Type: String
+    Default: www.somethingcode.com
+    Description: Bucket that hosts the frontend web files.
+
+  URLFrontend:
+    Type: String
+    Default: "www.somethingcode.com"
+
+Resources:
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'CloudFront OAI for ${URLFrontend}'
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3FrontendDeployBucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Domain
+          Value: !Ref URLFrontend
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+            Effect: Allow
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref Bucket, '/*']]
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+
+Outputs:
+  CloudFrontOriginAccessIdentity:
+    Value: !Ref CloudFrontOriginAccessIdentity
+  S3FrontendDeployBucket:
+    Value: !Ref Bucket
