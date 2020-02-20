@@ -3,45 +3,113 @@
 #
 # Description:
 #   Deploys components required for the Sagemaker; namely
-#   the notebook instance, the endpoint, and the model.
+#   the endpoint, its configuration, and the model.
 #
-# Currently contains stub values; deployment will not work.
 
 
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Nested template for creating SageMaker infra.
 
+Parameters:
+
+  S3ArtifactsBucket:
+    Type: String
+    Default: studybuddy-cicd-pipeline
+    Description: Bucket containing the Lambda source code.
 
 Resources:
 
-  SageMakerNotebookChunkClassifier:
-    Type: AWS::SageMaker::NotebookInstance
-    Properties: 
-      DefaultCodeRepository: String
-      DirectInternetAccess: Disabled
-      InstanceType: ml.t3.medium
-      NotebookInstanceName: ChunkClassifierNotebook
-      RoleArn: String
-      RootAccess: Disabled
-      VolumeSizeInGB: 5
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - sagemaker.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: SageMakerExecutionPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - s3:ListBucket
+            Resource: arn:aws:s3:::*
+            Effect: Allow
+          - Action:
+            - sagemaker:InvokeEndpoint
+            Resource: arn:aws:sagemaker:*:*:endpoint/*
+            Effect: Allow
+          - Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            Resource:
+            - arn:aws:s3:::*
+            Effect: Allow
+          Version: '2012-10-17'
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
 
+  # ML model -- model data should be transferred from GitHub repo to S3 via
+  # the backend CICD Pipeline.
   SageMakerModelChunkClassifier:
     Type: AWS::SageMaker::Model
     Properties: 
-      Containers: 
-        - ContainerHostname: String
-          Environment: Json
-          Image: String
-          Mode: String
-          ModelDataUrl: String
-      ExecutionRoleArn: String
-      ModelName: ChunkClassifierModel
+      ModelName: "ChunkClassifierModel"
+      ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
+      PrimaryContainer:
+        ModelDataUrl: !Sub s3://${S3ArtifactsBucket}/SageMaker/ChunkClassification/model.tar.gz
+        Image: !Sub "811284229777.dkr.ecr.${AWS::Region}.amazonaws.com/blazingtext:latest"
 
-  SageMakerEndpointChunkClassifier:
-    Type: AWS::SageMaker::Endpoint
+  SageMakerChunkClassifierEndpoint:
+    Type: "AWS::SageMaker::Endpoint"
+    Properties:
+      EndpointConfigName: !GetAtt SageMakerChunkClassifierEndpointConfig.EndpointConfigName
+
+  SageMakerChunkClassifierEndpointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"
+    Properties:
+      EndpointConfigName: "ChunkClassifierEndpointConfig"
+      ProductionVariants:  
+      - ModelName: !GetAtt SageMakerModelChunkClassifier.ModelName
+        VariantName: AllTraffic
+        InitialInstanceCount: 1
+        InstanceType: ml.t2.medium
+        InitialVariantWeight: 1
+
+  # ML model -- model data should be transferred from GitHub repo to S3 via
+  # the backend CICD Pipeline.
+  SageMakerModelQuestionClassifier:
+    Type: AWS::SageMaker::Model
     Properties: 
-      EndpointConfigName: String
-      EndpointName: ChunkClassifierEndpoint
-      ExcludeRetainedVariantProperties: 
-        - VariantProperty
-      RetainAllVariantProperties: Boolean
+      ModelName: "QuestionClassifierModel"
+      ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
+      PrimaryContainer:
+        ModelDataUrl: !Sub s3://${S3ArtifactsBucket}/SageMaker/QuestionClassification/model.tar.gz
+        Image: !Sub "811284229777.dkr.ecr.${AWS::Region}.amazonaws.com/blazingtext:latest"
+
+  SageMakerQuestionClassifierEndpoint:
+    Type: "AWS::SageMaker::Endpoint"
+    Properties:
+      EndpointConfigName: !GetAtt SageMakerQuestionClassifierEndpointConfig.EndpointConfigName
+
+  SageMakerQuestionClassifierEndpointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"
+    Properties:
+      EndpointConfigName: "QuestionClassifierEndpointConfig"
+      ProductionVariants:  
+      - ModelName: !GetAtt SageMakerModelQuestionClassifier.ModelName
+        VariantName: AllTraffic
+        InitialInstanceCount: 1
+        InstanceType: ml.t2.medium
+        InitialVariantWeight: 1
+
+Outputs:
+  SageMakerChunkClassifierEndpointName:
+    Value: !GetAtt SageMakerChunkClassifierEndpoint.EndpointName
+  SageMakerQuestionClassifierEndpointName:
+    Value: !GetAtt SageMakerQuestionClassifierEndpoint.EndpointName

@@ -41,6 +41,8 @@ Resources:
     Properties: 
       Parameters:
         EnvVarDbUrl: !GetAtt NestedStackRDS.Outputs.RDSApplicationUrl
+        SageMakerChunkClassifierEndpointName: !GetAtt NestedStackSageMaker.Outputs.SageMakerChunkClassifierEndpointName
+        SageMakerQuestionClassifierEndpointName: !GetAtt NestedStackSageMaker.Outputs.SageMakerQuestionClassifierEndpointName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 
@@ -62,10 +64,9 @@ Resources:
    Type: AWS::CloudFormation::Stack
    DependsOn: 
    - NestedStackFrontend
-   - NestedStackLambda
    Properties:
      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
-     TimeoutInMinutes: 25
+     TimeoutInMinutes: 30
 
   # Needs to be created after CICD Pipelines.
   # The Backend CICD Pipeline pulls in the backend code from GitHub,
@@ -79,3 +80,15 @@ Resources:
         RDSEndpointAddress: !GetAtt NestedStackRDS.Outputs.RDSApplicationUrl
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-rds-import.yaml"
       TimeoutInMinutes: 25
+
+  # Needs to be created after CICD Pipelines.
+  # The Backend CICD Pipeline pulls in the backend code from GitHub,
+  # which includes the SageMaker model data. 
+  # The model data is used to construct the initial model.
+  NestedStackSageMaker:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+    - NestedStackCICD
+    Properties: 
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-sagemaker.yaml"
+      TimeoutInMinutes: 40
