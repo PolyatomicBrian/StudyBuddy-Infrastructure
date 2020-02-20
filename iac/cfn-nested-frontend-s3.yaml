@@ -56,5 +56,5 @@ Resources:
 Outputs:
   CloudFrontOriginAccessIdentity:
     Value: !Ref CloudFrontOriginAccessIdentity
-  FrontendDeployBucket:
+  S3FrontendDeployBucket:
     Value: !Ref Bucket

@@ -57,7 +57,7 @@ Resources:
   NestedStackFrontendS3:
    Type: AWS::CloudFormation::Stack
    Properties:
-     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-s3.yaml"
      TimeoutInMinutes: 10
 
   NestedStackFrontendCloudFront:
@@ -66,14 +66,13 @@ Resources:
      Parameters:
        CloudFrontOriginAccessIdentity: !GetAtt NestedStackFrontendS3.Outputs.CloudFrontOriginAccessIdentity
        S3FrontendDeployBucket: !GetAtt NestedStackFrontendS3.Outputs.S3FrontendDeployBucket
-     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend.yaml"
+     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-cloudfront.yaml"
      TimeoutInMinutes: 60
   
   NestedStackCICD:
    Type: AWS::CloudFormation::Stack
    DependsOn: 
    - NestedStackFrontendS3
-   - NestedStackLambda
    Properties:
      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
      TimeoutInMinutes: 30
@@ -99,6 +98,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn:
     - NestedStackCICD
+    - NestedStackFrontendCloudFront  # Force SageMaker to wait on lengthy process so Pipeline has time to deploy artifacts.
     Properties: 
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-sagemaker.yaml"
       TimeoutInMinutes: 40
