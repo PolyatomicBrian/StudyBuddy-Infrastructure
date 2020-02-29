@@ -334,6 +334,7 @@ Resources:
                       dirname=${dirname%*/}
                       cd $dirname
                       zip -r ${dirname}.zip *
+                      aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip || echo "Unable to update Lambda ${dirname}"
                       cd ../
                     done;
                   - cd ..
