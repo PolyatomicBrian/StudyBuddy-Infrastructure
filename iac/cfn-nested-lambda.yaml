@@ -572,6 +572,7 @@ Resources:
       - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       - "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
       - "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+      - "arn:aws:iam::aws:policy/AmazonCognitoReadOnly"
 
   LambdaAcceptInvitation:
     Type: AWS::Lambda::Function
