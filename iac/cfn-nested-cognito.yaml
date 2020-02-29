@@ -142,3 +142,7 @@ Outputs:
     Value: !Ref HostedUserPoolDomainName
   CognitoUserPoolArn:
     Value: !GetAtt CognitoUserPool.Arn
+  CognitoUserPoolId:
+    Value: !Ref CognitoUserPool
+  CognitoClientId:
+    Value: !Ref CognitoUserPoolClient
