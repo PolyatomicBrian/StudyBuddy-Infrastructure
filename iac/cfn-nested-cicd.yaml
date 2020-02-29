@@ -171,7 +171,7 @@ Resources:
               CACHE_CONTROL: "86400"
               S3_BUCKET: "${S3FrontendDeployBucket}"
               BUILD_FOLDER: "dist"
-              CONFIG_FILE: "config.json"
+              CONFIG_FILE: "src/assets/config.json"
               CONFIG_DEFAULT_BASE_URL: "https://api-dev.somethingcode.com"
           phases:
             install:
@@ -185,9 +185,12 @@ Resources:
               commands:
               - echo Build started
               - sed -i s,'$CONFIG_DEFAULT_BASE_URL','https://${URLBackend}',g $CONFIG_FILE
-              - sed -i s,'"cognitoBase": ".*",','"cognitoBase": "https://${HostedUserPoolDomainName}",',g $CONFIG_FILE
-              - sed -i s,'"cognitoClientId": ".*",','"cognitoClientId": "${CognitoClientId}",',g $CONFIG_FILE
-              - sed -i s,'"cognitoRedirectUri": ".*",','"cognitoRedirectUri": "https://${S3FrontendDeployBucket}/callback",',g $CONFIG_FILE 
+              - >-
+                sed -i "s|\"cognitoBase\": \".*\",|\"cognitoBase\": \"https://${HostedUserPoolDomainName}\",|g" $CONFIG_FILE
+              - >-
+                sed -i "s|\"cognitoClientId\": \".*\",|\"cognitoClientId\": \"${CognitoClientId}\",|g" $CONFIG_FILE
+              - >-
+                sed -i "s|\"cognitoRedirectUri\": \".*\",|\"cognitoRedirectUri\": \"https://${S3FrontendDeployBucket}/callback\",|g" $CONFIG_FILE 
               - ng build --prod
           artifacts:
             files:
