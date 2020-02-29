@@ -336,6 +336,7 @@ Resources:
                       zip -r ${dirname}.zip *
                       cd ../
                     done;
+                  - cd ..
                   - cd ./NodeLambdas/
                   - npm install
                   - npm run build-all
