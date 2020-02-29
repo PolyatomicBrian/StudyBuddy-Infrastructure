@@ -21,11 +21,6 @@ Description: Nested template for Frontend deployment.
 
 Parameters:
 
-  S3FrontendDeployBucket:
-    Type: String
-    Default: www.somethingcode.com
-    Description: Bucket that hosts the frontend web files.
-
   URLFrontend:
     Type: String
     Default: "www.somethingcode.com"
@@ -55,7 +50,7 @@ Resources:
           Compress: true
           ForwardedValues:
             QueryString: false
-          TargetOriginId: !Ref S3FrontendDeployBucket
+          TargetOriginId: !Ref URLFrontend
           ViewerProtocolPolicy: redirect-to-https
         DefaultRootObject: index.html
         CustomErrorResponses:
@@ -70,8 +65,8 @@ Resources:
         Enabled: true
         HttpVersion: http2
         Origins:
-          - DomainName: !Join ['', [!Ref S3FrontendDeployBucket, '.s3.amazonaws.com']]
-            Id: !Ref S3FrontendDeployBucket
+          - DomainName: !Join ['', [!Ref URLFrontend, '.s3.amazonaws.com']]
+            Id: !Ref URLFrontend
             S3OriginConfig:
               OriginAccessIdentity:
                 !Join ['', ['origin-access-identity/cloudfront/', !Ref CloudFrontOriginAccessIdentity]]

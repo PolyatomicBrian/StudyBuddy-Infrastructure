@@ -23,12 +23,9 @@ Parameters:
   EmailVerificationSubject:
     Type: String
     Default: "Welcome to StudyBuddy"
-  ClientCallbackUrl:
+  URLFrontend:
     Type: String
-    Default: "https://www.somethingcode.com"
-  LogoutUrl:
-    Type: String
-    Default: "https://www.somethingcode.com/logout"
+    Default: "www.somethingcode.com"
   HostedUserPoolDomainName:
     Type: String
     Default: "signin.somethingcode.com"
@@ -88,12 +85,12 @@ Resources:
         - openid
         - profile
       CallbackURLs: 
-        - !Ref ClientCallbackUrl
+        - !Join ['', ['https://', !Ref URLFrontend, '/']]
       ClientName: StudyBuddyFrontend
-      DefaultRedirectURI: !Ref ClientCallbackUrl
+      DefaultRedirectURI: !Join ['', ['https://', !Ref URLFrontend, '/']]
       GenerateSecret: true
       LogoutURLs: 
-        - !Ref LogoutUrl
+        - !Join ['', ['https://', !Ref URLFrontend, '/logout']]
       RefreshTokenValidity: 30
       SupportedIdentityProviders: 
         - COGNITO

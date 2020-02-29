@@ -1,4 +1,4 @@
-# cfn-master.yaml
+# cfn-nested-apigw.yaml
 # Author: Brian Jopling, Jan 2020
 #
 # Description:
@@ -21,9 +21,13 @@ Parameters:
   StageName:
     Type: String
     Default: v1
+  APIUrl:
+    Type: String
+    Default: "api.somethingcode.com"
   CognitoUserPoolArn:
     Type: String
     Default: placeholder
+    Description: Required and used by the OpenAPI spec during the RestAPI creation.
 
 Resources:
 
@@ -75,5 +79,34 @@ Resources:
     Properties:
       RestApiId: !Ref RestApiStudyBuddyBackend
       Description: Deployment of RestApi mapping.
+
+  # TLS cert used by custom domain name.
+  Cert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref APIUrl
+      DomainValidationOptions:
+        - DomainName: !Ref APIUrl
+          ValidationDomain: !Ref APIUrl
+      ValidationMethod: DNS
+
+  # Allows API to have custom domain name.
+  CustomDomainNameStudyBuddyApi:
+    Type: AWS::ApiGateway::DomainName
+    Properties: 
+      CertificateArn: !Ref Cert
+      DomainName: !Ref APIUrl
+      EndpointConfiguration: 
+        Types: 
+          - EDGE
+      SecurityPolicy: "TLS_1_2"
+      
+  # Connects custom domain name to Rest API.
+  BasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !Ref CustomDomainNameStudyBuddyApi
+      RestApiId: !Ref RestApiStudyBuddyBackend
+      Stage: !Ref StageStudyBuddyBackend
   
 
