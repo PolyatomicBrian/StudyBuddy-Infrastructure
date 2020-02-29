@@ -54,9 +54,9 @@ Resources:
       EmailVerificationMessage: !Ref EmailVerificationMessage
       EmailVerificationSubject: !Ref EmailVerificationSubject
       LambdaConfig:
-          PostAuthentication: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:auth_hook"
-          PostConfirmation: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:auth_hook"
-          PreSignUp: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:signup_hook"
+        PostAuthentication: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:auth_hook"
+        PostConfirmation: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:auth_hook"
+        PreSignUp: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:signup_hook"
       Schema:
         - Name: email
           AttributeDataType: String
