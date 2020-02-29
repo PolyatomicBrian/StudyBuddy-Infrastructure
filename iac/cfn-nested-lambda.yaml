@@ -80,6 +80,16 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: 
+              - "*"
+            AllowedMethods: 
+              - "GET"
+              - "PUT"
+            AllowedOrigins: 
+              - "*"
+            MaxAge: 3000
 
   RoleLambdaExecution:
     Type: AWS::IAM::Role
@@ -346,7 +356,7 @@ Resources:
         Variables:
           auth: !GetAtt CustomTriggerLambdaGenerateCognitoAuth.auth
           client_id: !Ref CognitoClientId
-          cognito_url: !Ref HostedUserPoolDomainName
+          cognito_url: !Join ['', ['https://', !Ref HostedUserPoolDomainName]]
           redirect_uri: !Ref CognitoCallbackUrl
 
   RoleHelperLambdaCognitoExecution:
@@ -759,6 +769,7 @@ Resources:
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
+  # Allow Cognito UserPool to invoke the signup and auth hooks (triggers).
   UserPoolSignupLambdaInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
