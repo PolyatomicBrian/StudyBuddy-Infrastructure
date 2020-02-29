@@ -11,11 +11,6 @@ Description: Nested template for Frontend deployment.
 
 Parameters:
 
-  S3FrontendDeployBucket:
-    Type: String
-    Default: www.somethingcode.com
-    Description: Bucket that hosts the frontend web files.
-
   URLFrontend:
     Type: String
     Default: "www.somethingcode.com"
@@ -31,7 +26,7 @@ Resources:
   Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref S3FrontendDeployBucket
+      BucketName: !Ref URLFrontend
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
