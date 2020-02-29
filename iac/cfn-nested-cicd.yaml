@@ -321,7 +321,7 @@ Resources:
           phases:
             install:
               runtime-versions:
-                  python: 3.8
+                  nodejs: 12
               commands:
                   - echo Starting...
             build:
@@ -336,11 +336,13 @@ Resources:
                       zip -r ${dirname}.zip *
                       cd ../
                     done;
+                  - cd ./NodeLambdas/
+                  - npm install
+                  - npm run build-all
                   - echo Deployment complete.
           artifacts:
             files:
             - '**/*'
-            base-directory: 'APILambdas'
             discard-paths: no
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
