@@ -44,7 +44,7 @@ Parameters:
   NodeLambdaDir:
     Type: String
     Default: NodeLambdas
-  S3DocumentsBucket:
+  S3DocumentsBucketName:
     Type: String
     Default: studybuddy-documents
     Description: Bucket containing the document files.
@@ -59,6 +59,15 @@ Parameters:
 
 
 Resources:
+
+  S3DocumentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3DocumentsBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
 
   RoleLambdaExecution:
     Type: AWS::IAM::Role
