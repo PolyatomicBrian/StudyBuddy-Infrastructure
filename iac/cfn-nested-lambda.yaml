@@ -56,6 +56,18 @@ Parameters:
     Type: String
     Description: "Cognito UserPool ID passed from Cognito template."
     Default: "placeholder"
+  HostedUserPoolDomainName:
+    Type: String
+    Description: "Cognito URL passed from Cognito template."
+    Default: "placeholder"
+  CognitoCallbackUrl:
+    Type: String
+    Description: "Cognito callback URL passed from Cognito template."
+    Default: "placeholder"
+  CognitoUserPoolArn:
+    Type: String
+    Description: "Cognito UserPool ARN passed from Cognito template."
+    Default: "placeholder"
 
 
 Resources:
@@ -334,6 +346,8 @@ Resources:
         Variables:
           auth: !GetAtt CustomTriggerLambdaGenerateCognitoAuth.auth
           client_id: !Ref CognitoClientId
+          cognito_url: !Ref HostedUserPoolDomainName
+          redirect_uri: !Ref CognitoCallbackUrl
 
   RoleHelperLambdaCognitoExecution:
     Type: AWS::IAM::Role
@@ -745,7 +759,21 @@ Resources:
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
+  UserPoolSignupLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName: !Ref LambdaSignupHook
+      SourceArn: !Ref CognitoUserPoolArn
 
+  UserPoolAuthLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: cognito-idp.amazonaws.com
+      FunctionName: !Ref LambdaAuthHook
+      SourceArn: !Ref CognitoUserPoolArn
           
           
           

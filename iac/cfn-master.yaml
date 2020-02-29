@@ -107,8 +107,11 @@ Resources:
         SageMakerQuestionClassifierEndpointName: !GetAtt NestedStackSageMaker.Outputs.SageMakerQuestionClassifierEndpointName
         CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
         CognitoUserPoolId: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolId
+        CognitoCallbackUrl: !GetAtt NestedStackCognito.Outputs.CognitoCallbackUrl
+        CognitoUserPoolArn: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolArn
         S3ArtifactsBucket: !Ref S3ArtifactsBucket
         S3DocumentsBucketName: !Ref S3DocumentsBucketName
+        HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 

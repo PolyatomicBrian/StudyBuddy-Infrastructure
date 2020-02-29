@@ -143,3 +143,5 @@ Outputs:
     Value: !Ref CognitoUserPool
   CognitoClientId:
     Value: !Ref CognitoUserPoolClient
+  CognitoCallbackUrl:
+    Value: !Join ['', ['https://', !Ref URLFrontend, '/callback']]
