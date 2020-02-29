@@ -38,6 +38,18 @@ Parameters:
     Type: String
     Default: studybuddy-cicd-pipeline
     Description: Bucket containing the Lambda source code.
+  S3DocumentsBucket:
+    Type: String
+    Default: studybuddy-documents
+    Description: Bucket containing the document files.
+  CognitoClientId:
+    Type: String
+    Description: "Cognito UserPool Client ID passed from Cognito template."
+    Default: "placeholder"
+  CognitoUserPoolId:
+    Type: String
+    Description: "Cognito UserPool ID passed from Cognito template."
+    Default: "placeholder"
 
 
 Resources:
@@ -65,6 +77,18 @@ Resources:
       ManagedPolicyArns:
       - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
+  LambdaPythonLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties: 
+      CompatibleRuntimes: 
+        - python3.7
+        - python3.8
+      Content: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "LambdaLayers/lxml-3-8/python.zip"
+      Description: "Contains the packages required by the Python Lambdas."
+      LayerName: PythonLayer
+
   LambdaDeleteStudent:
     Type: AWS::Lambda::Function
     Properties: 
@@ -76,6 +100,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -95,6 +121,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -114,6 +142,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -133,6 +163,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -142,6 +174,51 @@ Resources:
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
+  LambdaClassifyChunks:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "classifyChunks/classifyChunks.zip"
+      FunctionName: classifyChunks
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          CLASSIFICATION_COUNT: "1"
+          ENDPOINT_NAME: !Ref SageMakerChunkClassifierEndpointName
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
+  LambdaCreateConversation:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "createConversation/createConversation.zip"
+      FunctionName: createConversation
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
 
   LambdaCreateStudent:
     Type: AWS::Lambda::Function
@@ -154,6 +231,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -173,6 +252,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -192,6 +273,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -199,6 +282,97 @@ Resources:
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
+  LambdaEpubChunker:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "epubChunker/epubChunker.zip"
+      FunctionName: epubChunker
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucket
+
+  LambdaExchange:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "exchange/exchange.zip"
+      FunctionName: exchange
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          auth: !GetAtt CustomTriggerLambdaGenerateCognitoAuth.auth
+          client_id: !Ref CognitoClientId
+
+  RoleHelperLambdaCognitoExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/AmazonCognitoReadOnly"
+
+  HelperLambdaGenerateCognitoAuth:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import base64
+          import cfnresponse
+
+          def lambda_handler(event, context):
+              if event["RequestType"].lower() == "delete":
+                  return cfnresponse.send(event, context, cfnresponse.SUCCESS, {"status": "Nothing to do"})
+              client = boto3.client('cognito-idp')
+              client_id = event["ResourceProperties"]["ClientId"]
+              pool_id = event["ResourceProperties"]["PoolId"]
+              print("C: %s, P: %s" % (client_id, pool_id))
+              response = client.describe_user_pool_client(
+                  UserPoolId=pool_id,
+                  ClientId=client_id
+              )
+              client_secret = response["UserPoolClient"]["ClientSecret"]
+              auth_byte = bytes(client_id + ":" + client_secret, encoding="utf-8")
+              b64_auth = base64.b64encode(auth_byte)
+              ret_b64_auth = "Basic %s" % b64_auth.decode("utf-8")
+              return cfnresponse.send(event, context, cfnresponse.SUCCESS, {"auth": ret_b64_auth})
+      Handler: "index.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleHelperLambdaCognitoExecution.Arn
+      Runtime: python3.7
+      Timeout: 10
+  CustomTriggerLambdaGenerateCognitoAuth:
+    Type: Custom::LambdaGenerateCognitoAuth
+    Properties: 
+      ServiceToken: !GetAtt HelperLambdaGenerateCognitoAuth.Arn
+      ClientId: !Ref CognitoClientId
+      PoolId: !Ref CognitoUserPoolId
 
   LambdaGetConversation:
     Type: AWS::Lambda::Function
@@ -211,6 +385,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -230,6 +406,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -237,6 +415,25 @@ Resources:
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
+  LambdaGetSearchTerms:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "getSearchTerms/getSearchTerms.zip"
+      FunctionName: getSearchTerms
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          CLASSIFICATION_COUNT: "1"
+          ENDPOINT_NAME: !Ref SageMakerQuestionClassifierEndpointName
 
   LambdaLibrary:
     Type: AWS::Lambda::Function
@@ -249,6 +446,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -256,6 +455,47 @@ Resources:
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
+  LambdaPresign:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "presign/presign.zip"
+      FunctionName: presign
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          s3_bucket: !Ref S3DocumentsBucket
+
+  LambdaProcess:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code: 
+        S3Bucket: !Ref S3ArtifactsBucket
+        S3Key: "process/process.zip"
+      FunctionName: process
+      Handler: "lambda_function.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaExecution.Arn
+      Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
+      Timeout: 300
+      Environment:
+        Variables:
+          DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucket
+          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
+          db_url: !Ref EnvVarDbUrl
+          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+
 
   LambdaRateResponse:
     Type: AWS::Lambda::Function
@@ -268,6 +508,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -287,6 +529,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
@@ -306,6 +550,8 @@ Resources:
       MemorySize: 128
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
+      Layers: 
+        - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:

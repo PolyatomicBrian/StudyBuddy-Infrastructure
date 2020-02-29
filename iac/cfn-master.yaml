@@ -43,6 +43,8 @@ Resources:
         EnvVarDbUrl: !GetAtt NestedStackRDS.Outputs.RDSApplicationUrl
         SageMakerChunkClassifierEndpointName: !GetAtt NestedStackSageMaker.Outputs.SageMakerChunkClassifierEndpointName
         SageMakerQuestionClassifierEndpointName: !GetAtt NestedStackSageMaker.Outputs.SageMakerQuestionClassifierEndpointName
+        CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
+        CognitoUserPoolId: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolId
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 

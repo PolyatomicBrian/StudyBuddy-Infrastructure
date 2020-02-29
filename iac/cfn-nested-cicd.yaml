@@ -36,7 +36,7 @@ Parameters:
     Default: master
   GitHubBranchBackend:
     Type: String
-    Default: development
+    Default: master
   GitHubToken:
     Type: String
     Default: "cicd-github-access:SecretString:token"
