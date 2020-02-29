@@ -53,10 +53,22 @@ Resources:
         EmailSendingAccount: COGNITO_DEFAULT 
       EmailVerificationMessage: !Ref EmailVerificationMessage
       EmailVerificationSubject: !Ref EmailVerificationSubject
+      LambdaConfig:
+          PostAuthentication: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:auth_hook"
+          PostConfirmation: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:auth_hook"
+          PreSignUp: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:signup_hook"
       Schema:
         - Name: email
           AttributeDataType: String
-          Mutable: false
+          Mutable: true
+          Required: true
+        - Name: given_name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: family_name
+          AttributeDataType: String
+          Mutable: true
           Required: true
       UserPoolName: StudyBuddyUserPool
       UsernameAttributes: 
@@ -110,6 +122,8 @@ Resources:
     Properties: 
       AttributeMapping:
         email: email
+        given_name: given_name
+        family_name: family_name
       ProviderDetails:
         client_id: !Sub "{{resolve:secretsmanager:${IdentityProviderGoogleClientId}}}"
         client_secret: !Sub "{{resolve:secretsmanager:${IdentityProviderGoogleClientSecret}}}"
