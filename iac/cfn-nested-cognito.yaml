@@ -85,9 +85,9 @@ Resources:
         - openid
         - profile
       CallbackURLs: 
-        - !Join ['', ['https://', !Ref URLFrontend, '/']]
+        - !Join ['', ['https://', !Ref URLFrontend, '/callback']]
       ClientName: StudyBuddyFrontend
-      DefaultRedirectURI: !Join ['', ['https://', !Ref URLFrontend, '/']]
+      DefaultRedirectURI: !Join ['', ['https://', !Ref URLFrontend, '/callback']]
       GenerateSecret: true
       LogoutURLs: 
         - !Join ['', ['https://', !Ref URLFrontend, '/logout']]

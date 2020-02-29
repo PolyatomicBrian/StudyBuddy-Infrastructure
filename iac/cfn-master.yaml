@@ -152,6 +152,8 @@ Resources:
        GitHubBackendRepo: !Ref GitHubBackendRepo
        GitHubBranchFrontend: !Ref GitHubBranchFrontend
        GitHubBranchBackend: !Ref GitHubBranchBackend
+       HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
+       CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
      TimeoutInMinutes: 30
 
