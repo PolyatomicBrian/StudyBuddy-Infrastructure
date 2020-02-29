@@ -1945,7 +1945,7 @@ securityDefinitions:
     x-amazon-apigateway-authtype: "cognito_user_pools"
     x-amazon-apigateway-authorizer:
       providerARNs:
-      - Fn::Sub "${CognitoUserPoolArn}"
+      - Fn::Sub: "${CognitoUserPoolArn}"
       type: "cognito_user_pools"
 definitions:
   Empty:
