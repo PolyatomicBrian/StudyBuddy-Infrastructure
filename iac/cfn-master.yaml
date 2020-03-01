@@ -112,7 +112,6 @@ Resources:
         S3ArtifactsBucket: !Ref S3ArtifactsBucket
         HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
         S3DocumentsBucketName: !Ref S3DocumentsBucketName
-        S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 
