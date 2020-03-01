@@ -140,6 +140,36 @@ Resources:
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
+  RoleAskQuestionLambdaExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+      - PolicyName: SageMakerInvocationPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - sagemaker:InvokeEndpoint
+            Resource: arn:aws:sagemaker:*:*:endpoint/*
+            Effect: Allow
+      - PolicyName: ComprehendPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - comprehend:DetectKeyPhrases
+            Resource: "*"
+            Effect: Allow
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
   LambdaAskQuestion:
     Type: AWS::Lambda::Function
     Properties: 
@@ -149,14 +179,14 @@ Resources:
       FunctionName: askQuestion
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
-      Role: !GetAtt RoleLambdaExecution.Arn
+      Role: !GetAtt RoleAskQuestionLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
       Environment:
         Variables:
-          CLASSIFICATION_COUNT: 1
+          CLASSIFICATION_COUNT: "1"
           ENDPOINT_NAME: !Ref SageMakerQuestionClassifierEndpointName
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
@@ -207,6 +237,37 @@ Resources:
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
+  RoleClassifyChunksLambdaExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+      - PolicyName: SageMakerInvocationPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - sagemaker:InvokeEndpoint
+            Resource: arn:aws:sagemaker:*:*:endpoint/*
+            Effect: Allow
+      - PolicyName: ComprehendPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - s3:GetObject
+            - s3:DeleteObject
+            Resource: !Sub "arn:aws:s3:::${S3DocumentsBucketName}/*"
+            Effect: Allow
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
   LambdaClassifyChunks:
     Type: AWS::Lambda::Function
     Properties: 
@@ -216,7 +277,7 @@ Resources:
       FunctionName: classifyChunks
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
-      Role: !GetAtt RoleLambdaExecution.Arn
+      Role: !GetAtt RoleClassifyChunksLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
         - !Ref LambdaPythonLayer 
@@ -229,6 +290,7 @@ Resources:
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
+          DOCUMENTS_FILES_BUCKET: !Ref S3DocumentsBucketName
 
   LambdaCreateConversation:
     Type: AWS::Lambda::Function
@@ -315,6 +377,45 @@ Resources:
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
 
+  RoleEpubChunkerLambdaExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+      - PolicyName: S3ObjectsPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            Resource: !Sub "arn:aws:s3:::${S3DocumentsBucketName}/*"
+            Effect: Allow
+      - PolicyName: S3BucketPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - s3:ListBucket
+            Resource: !Sub "arn:aws:s3:::${S3DocumentsBucketName}"
+            Effect: Allow
+      - PolicyName: LambdaInvokePolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - lambda:InvokeFunction
+            Resource: !GetAtt LambdaClassifyChunks.Arn
+            Effect: Allow
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
   LambdaEpubChunker:
     Type: AWS::Lambda::Function
     Properties: 
@@ -324,7 +425,7 @@ Resources:
       FunctionName: epubChunker
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
-      Role: !GetAtt RoleLambdaExecution.Arn
+      Role: !GetAtt RoleEpubChunkerLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
         - !Ref LambdaPythonLayer 
