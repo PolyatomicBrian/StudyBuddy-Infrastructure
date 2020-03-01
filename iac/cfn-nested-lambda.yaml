@@ -156,6 +156,8 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
+          CLASSIFICATION_COUNT: 1
+          ENDPOINT_NAME: !Ref SageMakerQuestionClassifierEndpointName
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
@@ -530,6 +532,37 @@ Resources:
         Variables:
           s3_bucket: !Ref S3DocumentsBucketName
 
+  RoleLambdaProcessExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+      - PolicyName: ProcessedObjectPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - s3:GetObject
+            - s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${S3DocumentsBucketName}/*"
+            Effect: Allow
+      - PolicyName: ProcessedInvokeEPubChunkerPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - lambda:InvokeFunction
+            Resource: !GetAtt LambdaEpubChunker.Arn
+            Effect: Allow
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
   LambdaProcess:
     Type: AWS::Lambda::Function
     Properties: 
@@ -539,7 +572,7 @@ Resources:
       FunctionName: process
       Handler: "lambda_function.lambda_handler"
       MemorySize: 128
-      Role: !GetAtt RoleLambdaExecution.Arn
+      Role: !GetAtt RoleLambdaProcessExecution.Arn
       Runtime: python3.8
       Layers: 
         - !Ref LambdaPythonLayer 
