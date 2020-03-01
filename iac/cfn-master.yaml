@@ -107,8 +107,12 @@ Resources:
         SageMakerQuestionClassifierEndpointName: !GetAtt NestedStackSageMaker.Outputs.SageMakerQuestionClassifierEndpointName
         CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
         CognitoUserPoolId: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolId
+        CognitoCallbackUrl: !GetAtt NestedStackCognito.Outputs.CognitoCallbackUrl
+        CognitoUserPoolArn: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolArn
         S3ArtifactsBucket: !Ref S3ArtifactsBucket
-        S3DocumentsBucketName: !Ref S3DocumentsBucketName
+        HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
+        S3DocumentsBucketName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketName
+        S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 
@@ -127,6 +131,7 @@ Resources:
    Properties:
      Parameters:
        URLFrontend: !Ref URLFrontend
+       S3DocumentsBucketName: !Ref S3DocumentsBucketName
      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-s3.yaml"
      TimeoutInMinutes: 10
 
@@ -141,8 +146,6 @@ Resources:
   
   NestedStackCICD:
    Type: AWS::CloudFormation::Stack
-   DependsOn: 
-   - NestedStackFrontendS3
    Properties:
      Parameters:
        S3FrontendDeployBucket: !Ref URLFrontend
@@ -154,6 +157,7 @@ Resources:
        GitHubBranchBackend: !Ref GitHubBranchBackend
        HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
        CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
+       S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
      TimeoutInMinutes: 30
 

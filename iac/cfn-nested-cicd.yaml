@@ -30,6 +30,11 @@ Parameters:
   CognitoClientId:
     Type: String
     Default: placeholder
+    Description: "Value to be passed in from master template"
+  S3DocumentsBucketDomainName:
+    Type: String
+    Default: placeholder
+    Description: "Value to be passed in from master template"
 
   GitHubUserName:
     Type: String
@@ -184,7 +189,10 @@ Resources:
             build:
               commands:
               - echo Build started
-              - sed -i s,'$CONFIG_DEFAULT_BASE_URL','https://${URLBackend}',g $CONFIG_FILE
+              - >-
+                sed -i "s|$CONFIG_DEFAULT_BASE_URL|https://${URLBackend}|g" $CONFIG_FILE
+              - >-
+                sed -i "s|\"s3uploadUrl\": \".*\",|\"s3uploadUrl\": \"${S3DocumentsBucketDomainName}\",|g" $CONFIG_FILE
               - >-
                 sed -i "s|\"cognitoBase\": \".*\",|\"cognitoBase\": \"https://${HostedUserPoolDomainName}\",|g" $CONFIG_FILE
               - >-
