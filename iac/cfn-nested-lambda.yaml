@@ -72,25 +72,6 @@ Parameters:
 
 Resources:
 
-  S3DocumentsBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref S3DocumentsBucketName
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      CorsConfiguration:
-        CorsRules:
-          - AllowedHeaders: 
-              - "*"
-            AllowedMethods: 
-              - "GET"
-              - "PUT"
-            AllowedOrigins: 
-              - "*"
-            MaxAge: 3000
-
   RoleLambdaExecution:
     Type: AWS::IAM::Role
     Properties:
@@ -336,7 +317,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucket
+          DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucketName
 
   LambdaExchange:
     Type: AWS::Lambda::Function
@@ -511,7 +492,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          s3_bucket: !Ref S3DocumentsBucket
+          s3_bucket: !Ref S3DocumentsBucketName
 
   LambdaProcess:
     Type: AWS::Lambda::Function
@@ -529,7 +510,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucket
+          DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucketName
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl

@@ -14,6 +14,9 @@ Parameters:
   URLFrontend:
     Type: String
     Default: "www.somethingcode.com"
+  S3DocumentsBucketName:
+    Type: String
+    Default: "placeholder"
 
 Resources:
 
@@ -48,8 +51,31 @@ Resources:
             Principal:
               CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
 
+  S3DocumentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3DocumentsBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: 
+              - "*"
+            AllowedMethods: 
+              - "GET"
+              - "PUT"
+            AllowedOrigins: 
+              - "*"
+            MaxAge: 3000
+
 Outputs:
   CloudFrontOriginAccessIdentity:
     Value: !Ref CloudFrontOriginAccessIdentity
   S3FrontendDeployBucket:
     Value: !Ref Bucket
+  S3DocumentsBucket:
+    Value: !Ref S3DocumentsBucket
+  S3DocumentsBucketDomainName:
+    Value: !GetAtt S3DocumentsBucket.DomainName
