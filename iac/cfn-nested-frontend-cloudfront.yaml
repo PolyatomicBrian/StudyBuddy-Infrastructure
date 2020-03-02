@@ -1,9 +1,14 @@
-# cfn-nested-frontend.yaml
+# cfn-nested-frontend-cloudfront.yaml
 # Author: Brian Jopling, Feb 2020
 #
 # Description:
 #   Deploys components required for frontend web hosting; namely the
-#   S3 Web Hosting Bucket and CloudFront resources.
+#   CloudFront resource.
+#
+# Decoupled from the other frontend template because this one takes
+# 30 minutes to deploy. The other frontend template is a dependency
+# for other templates to start deploying, so this way the CloudFront
+# distribution can be created in parallel.
 #
 # Usage: - Manual validation of ACM cert must be done during the deployment process.
 #           Otherwise, the stack will hang.
@@ -16,14 +21,13 @@ Description: Nested template for Frontend deployment.
 
 Parameters:
 
-  S3FrontendDeployBucket:
-    Type: String
-    Default: www.somethingcode.com
-    Description: Bucket that hosts the frontend web files.
-
   URLFrontend:
     Type: String
     Default: "www.somethingcode.com"
+
+  CloudFrontOriginAccessIdentity:
+    Type: String
+    Default: "placeholder"
 
 Resources:
 
@@ -46,7 +50,7 @@ Resources:
           Compress: true
           ForwardedValues:
             QueryString: false
-          TargetOriginId: !Ref S3FrontendDeployBucket
+          TargetOriginId: !Ref URLFrontend
           ViewerProtocolPolicy: redirect-to-https
         DefaultRootObject: index.html
         CustomErrorResponses:
@@ -61,8 +65,8 @@ Resources:
         Enabled: true
         HttpVersion: http2
         Origins:
-          - DomainName: !Join ['', [!Ref Bucket, '.s3.amazonaws.com']]
-            Id: !Ref S3FrontendDeployBucket
+          - DomainName: !Join ['', [!Ref URLFrontend, '.s3.amazonaws.com']]
+            Id: !Ref URLFrontend
             S3OriginConfig:
               OriginAccessIdentity:
                 !Join ['', ['origin-access-identity/cloudfront/', !Ref CloudFrontOriginAccessIdentity]]
@@ -73,34 +77,3 @@ Resources:
       Tags:
         - Key: Domain
           Value: !Ref URLFrontend
-
-  CloudFrontOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub 'CloudFront OAI for ${URLFrontend}'
-
-  Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref S3FrontendDeployBucket
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
-      Tags:
-        - Key: Domain
-          Value: !Ref URLFrontend
-
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref Bucket
-      PolicyDocument:
-        Statement:
-          - Action:
-              - s3:GetObject
-            Effect: Allow
-            Resource: !Join ['', ['arn:aws:s3:::', !Ref Bucket, '/*']]
-            Principal:
-              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
