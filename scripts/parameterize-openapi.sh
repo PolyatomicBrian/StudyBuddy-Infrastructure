@@ -47,4 +47,4 @@ gsed -i s/us-east-2/'${AWS::Region}'/g $FILE
 gsed -i s/${ACCOUNT_ID}/'${AWS::AccountId}'/g $FILE
 gsed -i s/'^\(\s\+\)uri:'/'\1uri:\n\1  Fn::Sub:'/g $FILE
 gsed -i s,'^\(\s\+\)passthroughBehavior','\1credentials:\n\1  Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"\n\1passthroughBehavior',g $FILE
-gsed -i s,'"arn:aws:cognito-idp:.*:userpool/.*"','Fn::Sub "${CognitoUserPoolArn}"',g $FILE
+gsed -i s,'"arn:aws:cognito-idp:.*:userpool/.*"','Fn::Sub: "${CognitoUserPoolArn}"',g $FILE
