@@ -84,13 +84,13 @@ Parameters:
 
 Resources:
   NestedStackCognito:
-   Type: AWS::CloudFormation::Stack
-   Properties: 
-     Parameters:
-       URLFrontend: !Ref URLFrontend
-       HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
-     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
-     TimeoutInMinutes: 30
+    Type: AWS::CloudFormation::Stack
+    Properties: 
+      Parameters:
+        URLFrontend: !Ref URLFrontend
+        HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cognito.yaml"
+      TimeoutInMinutes: 30
 
   NestedStackRDS:
     Type: AWS::CloudFormation::Stack
@@ -126,39 +126,47 @@ Resources:
       TimeoutInMinutes: 10
   
   NestedStackFrontendS3:
-   Type: AWS::CloudFormation::Stack
-   Properties:
-     Parameters:
-       URLFrontend: !Ref URLFrontend
-       S3DocumentsBucketName: !Ref S3DocumentsBucketName
-     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-s3.yaml"
-     TimeoutInMinutes: 10
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        URLFrontend: !Ref URLFrontend
+        S3DocumentsBucketName: !Ref S3DocumentsBucketName
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-s3.yaml"
+      TimeoutInMinutes: 10
 
   NestedStackFrontendCloudFront:
-   Type: AWS::CloudFormation::Stack
-   Properties:
-     Parameters:
-       CloudFrontOriginAccessIdentity: !GetAtt NestedStackFrontendS3.Outputs.CloudFrontOriginAccessIdentity
-       URLFrontend: !GetAtt NestedStackFrontendS3.Outputs.S3FrontendDeployBucket
-     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-cloudfront.yaml"
-     TimeoutInMinutes: 60
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        CloudFrontOriginAccessIdentity: !GetAtt NestedStackFrontendS3.Outputs.CloudFrontOriginAccessIdentity
+        URLFrontend: !GetAtt NestedStackFrontendS3.Outputs.S3FrontendDeployBucket
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-frontend-cloudfront.yaml"
+      TimeoutInMinutes: 60
+
+  NestedStackSes:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        URLFrontend: !Ref URLFrontend
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-ses.yaml"
+      TimeoutInMinutes: 60
   
   NestedStackCICD:
-   Type: AWS::CloudFormation::Stack
-   Properties:
-     Parameters:
-       S3FrontendDeployBucket: !Ref URLFrontend
-       S3ArtifactsBucket: !Ref S3ArtifactsBucket
-       GitHubUserName: !Ref GitHubUserName
-       GitHubFrontendRepo: !Ref GitHubFrontendRepo
-       GitHubBackendRepo: !Ref GitHubBackendRepo
-       GitHubBranchFrontend: !Ref GitHubBranchFrontend
-       GitHubBranchBackend: !Ref GitHubBranchBackend
-       HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
-       CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
-       S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
-     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
-     TimeoutInMinutes: 30
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        S3FrontendDeployBucket: !Ref URLFrontend
+        S3ArtifactsBucket: !Ref S3ArtifactsBucket
+        GitHubUserName: !Ref GitHubUserName
+        GitHubFrontendRepo: !Ref GitHubFrontendRepo
+        GitHubBackendRepo: !Ref GitHubBackendRepo
+        GitHubBranchFrontend: !Ref GitHubBranchFrontend
+        GitHubBranchBackend: !Ref GitHubBranchBackend
+        HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
+        CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
+        S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
+      TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
+      TimeoutInMinutes: 30
 
   # Needs to be created after CICD Pipelines.
   # The Backend CICD Pipeline pulls in the backend code from GitHub,
