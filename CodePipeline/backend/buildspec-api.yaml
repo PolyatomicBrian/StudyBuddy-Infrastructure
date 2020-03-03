@@ -9,7 +9,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-        python: 3.8
+        nodejs: 12
     commands:
         - echo Starting...
   build:
@@ -22,8 +22,16 @@ phases:
             dirname=${dirname%*/}
             cd $dirname
             zip -r ${dirname}.zip *
-            aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip
+            aws lambda update-function-code --function-name ${dirname} --zip-file fileb://${dirname}.zip || echo "Unable to update Lambda ${dirname}"
             cd ../
           done;
+        - cd ..
+        - cd ./NodeLambdas/
+        - npm install
+        - npm run build-all
         - echo Deployment complete.
-        
+artifacts:
+  files:
+  - '**/*'
+  discard-paths: no
+
