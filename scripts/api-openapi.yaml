@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-03-08T04:11:59Z"
+  version: "2020-03-08T21:04:49Z"
   title: "StudyBuddy"
 paths:
   /askquestion:
@@ -83,6 +83,11 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
         500:
           description: "500 response"
           headers:
@@ -99,6 +104,10 @@ paths:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:deleteBook/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
           default:
             statusCode: "200"
             responseParameters:
@@ -168,6 +177,11 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
         500:
           description: "500 response"
           headers:
@@ -179,6 +193,10 @@ paths:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:editBook/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
           default:
             statusCode: "200"
             responseParameters:
@@ -200,63 +218,6 @@ paths:
             \ : $input.json('$.new_edition')\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
-  /chunk:
-    post:
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
-          headers:
-            Access-Control-Allow-Origin:
-              type: "string"
-      x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:chunkTextbook/invocations"
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        contentHandling: "CONVERT_TO_TEXT"
-        type: "aws"
-    options:
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
-          headers:
-            Access-Control-Allow-Origin:
-              type: "string"
-            Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Headers:
-              type: "string"
-      x-amazon-apigateway-integration:
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
-        type: "mock"
   /conversation:
     post:
       consumes:
@@ -271,14 +232,32 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:createConversation/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
         credentials:
@@ -432,6 +411,11 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
         500:
           description: "500 response"
           headers:
@@ -448,6 +432,10 @@ paths:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:addBook/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
           default:
             statusCode: "200"
             responseParameters:
@@ -528,6 +516,11 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
         500:
           description: "500 response"
           headers:
@@ -544,6 +537,10 @@ paths:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:removeBookFromConversation/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
           default:
             statusCode: "200"
             responseParameters:
@@ -1239,6 +1236,11 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
         500:
           description: "500 response"
           headers:
@@ -1248,6 +1250,10 @@ paths:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:exchange/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
           default:
             statusCode: "200"
             responseParameters:
