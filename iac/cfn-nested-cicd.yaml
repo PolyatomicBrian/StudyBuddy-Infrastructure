@@ -201,7 +201,7 @@ Resources:
               - >-
                 sed -i "s|\"cognitoBase\": \".*\",|\"cognitoBase\": \"https://${HostedUserPoolDomainName}\",|g" $CONFIG_FILE
               - >-
-                sed -i "s|\"wsUrl\": \".*\",|\"wsUrl\": \"${WsApiGwWss}\",|g" $CONFIG_FILE
+                sed -i "s|\"wsUrl\": \".*\"|\"wsUrl\": \"${WsApiGwWss}\"|g" $CONFIG_FILE
               - >-
                 sed -i "s|\"cognitoClientId\": \".*\",|\"cognitoClientId\": \"${CognitoClientId}\",|g" $CONFIG_FILE
               - >-
