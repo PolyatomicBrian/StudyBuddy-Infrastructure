@@ -126,7 +126,6 @@ Resources:
     Properties:
       ApiKeySelectionExpression: "$request.header.x-api-key"
       Description: "WebSocket API to provide live updates"
-      FailOnWarnings: false
       Name: "StudyBuddyWs"
       ProtocolType: WEBSOCKET
       RouteSelectionExpression: "$request.body.action"
