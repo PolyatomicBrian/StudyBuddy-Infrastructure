@@ -206,7 +206,7 @@ Resources:
                 sed -i "s|\"cognitoClientId\": \".*\",|\"cognitoClientId\": \"${CognitoClientId}\",|g" $CONFIG_FILE
               - >-
                 sed -i "s|\"cognitoRedirectUri\": \".*\",|\"cognitoRedirectUri\": \"https://${S3FrontendDeployBucket}/callback\",|g" $CONFIG_FILE 
-              - ng build --prod
+              - npm run release
           artifacts:
             files:
             - '**/*'
