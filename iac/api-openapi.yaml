@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-02-25T01:08:25Z"
+  version: "2020-03-08T04:11:59Z"
   title: "StudyBuddy"
 paths:
   /askquestion:
@@ -80,12 +80,41 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        403:
+          description: "403 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+      security:
+      - Cognito: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:deleteBook/invocations"
         responses:
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
+          '.*"statusCode": 403.*':
+            statusCode: "403"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -136,6 +165,14 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
@@ -144,6 +181,14 @@ paths:
         responses:
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -223,6 +268,9 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
@@ -231,6 +279,8 @@ paths:
         responses:
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -291,16 +341,38 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getConversation/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
           default:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -357,6 +429,19 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        403:
+          description: "403 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
@@ -365,6 +450,20 @@ paths:
         responses:
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
+          '.*"statusCode": 403.*':
+            statusCode: "403"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -372,7 +471,103 @@ paths:
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"doc_id\" : $input.json('$.doc_id'),\n    \"conversation_id\"\
-            \ : $input.json('$.conversation_id')\n}"
+            \ : \"$input.params('conversation-id')\"\n}"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_match"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        type: "mock"
+  /conversation/{conversation-id}/books/{doc-id}:
+    delete:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "conversation-id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "doc-id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        403:
+          description: "403 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+      security:
+      - Cognito: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:removeBookFromConversation/invocations"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
+          '.*"statusCode": 403.*':
+            statusCode: "403"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
+            ,\n    \"doc_id\" : \"$input.params('doc-id')\",\n    \"conversation_id\"\
+            \ : \"$input.params('conversation-id')\"\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -425,16 +620,60 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        401:
+          description: "401 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        404:
+          description: "404 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:askQuestion/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
           default:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 401.*':
+            statusCode: "401"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
+          '.*"statusCode": 404.*':
+            statusCode: "404"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -671,16 +910,38 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:getConversations/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
           default:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "never"
@@ -978,6 +1239,11 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:exchange/invocations"
@@ -986,6 +1252,12 @@ paths:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -1313,16 +1585,38 @@ paths:
           headers:
             Access-Control-Allow-Origin:
               type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        500:
+          description: "500 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       security:
       - Cognito: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:library/invocations"
         responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
           default:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 500.*':
+            statusCode: "500"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: "$input.path('$.errorMessage')"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
@@ -1619,12 +1913,17 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:rateresponse/invocations"
         responses:
           default:
             statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
