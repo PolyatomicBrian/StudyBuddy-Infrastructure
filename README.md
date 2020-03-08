@@ -97,22 +97,25 @@ This repository contains or shall contain the following:
 
 - **Post-requisites:**
   1. Create an Alias A record pointing your API subdomain to the API Gateway CloudFront.
-     1. Go to AWS API Gateway in the AWS Console.
-     2. Select "Custom Domain Names" in the sidebar.
-     3. Copy the CloudFront URL.
-     4. Create an Alias A record pointing your subdomain to this URL.
-        - For example, in AWS Route 53, I created an `Alias` `A` record pointing `api.somethingcode.com` to `dabcdef123.cloudfront.net`.
+   
+        1. Go to AWS API Gateway in the AWS Console.
+        2. Select "Custom Domain Names" in the sidebar.
+        3. Copy the CloudFront URL.
+        4. Create an Alias A record pointing your subdomain to this URL.
+           - For example, in AWS Route 53, I created an `Alias` `A` record pointing `api.somethingcode.com` to `dabcdef123.cloudfront.net`.
 
    2. Create an Alias A record pointing your signin subdomain to the Cognito CloudFront.
-     1. Go to AWS Cognito in the AWS Console.
-     2. Select "Domain Name" in the sidebar.
-     3. Copy the "Alias target" CloudFront URL.
-     4. Create an Alias A record pointing your subdomain to this URL.
-        - For example, in AWS Route 53, I created an `Alias` `A` record pointing `signin.somethingcode.com` to `dabcdef246.cloudfront.net`.
+   
+        1. Go to AWS Cognito in the AWS Console.
+        2. Select "Domain Name" in the sidebar.
+        3. Copy the "Alias target" CloudFront URL.
+        4. Create an Alias A record pointing your subdomain to this URL.
+           - For example, in AWS Route 53, I created an `Alias` `A` record pointing `signin.somethingcode.com` to `dabcdef246.cloudfront.net`.
 
    3. Create an Alias A record pointing your www subdomain to the S3 CloudFront.
-     1. Go to AWS CloudFront in the AWS Console.
-     2. Select the ID of the only CloudFront distribution listed.
-     3. Copy the "Domain Name" CloudFront URL.
-     4. Create an Alias A record pointing your subdomain to this URL.
-        - For example, in AWS Route 53, I created an `Alias` `A` record pointing `www.somethingcode.com` to `dabcdef468.cloudfront.net`.
+   
+        1. Go to AWS CloudFront in the AWS Console.
+        2. Select the ID of the only CloudFront distribution listed.
+        3.  Copy the "Domain Name" CloudFront URL.
+        4.  Create an Alias A record pointing your subdomain to this URL.
+            - For example, in AWS Route 53, I created an `Alias` `A` record pointing `www.somethingcode.com` to `dabcdef468.cloudfront.net`.

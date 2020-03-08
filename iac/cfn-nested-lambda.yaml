@@ -28,11 +28,11 @@ Parameters:
     Default: "placeholder"
   SageMakerChunkClassifierEndpointName:
     Type: String
-    Description: "SageMaker Endpoint for chunk classification passed from SageMaker template."
+    Description: "SageMaker Endpoint for chunk classification passed from master template."
     Default: "placeholder"
   SageMakerQuestionClassifierEndpointName:
     Type: String
-    Description: "SageMaker Endpoint for chunk classification passed from SageMaker template."
+    Description: "SageMaker Endpoint for chunk classification passed from master template."
     Default: "placeholder"
   S3ArtifactsBucket:
     Type: String
@@ -50,25 +50,32 @@ Parameters:
     Description: Bucket containing the document files.
   CognitoClientId:
     Type: String
-    Description: "Cognito UserPool Client ID passed from Cognito template."
+    Description: "Cognito UserPool Client ID passed from master template."
     Default: "placeholder"
   CognitoUserPoolId:
     Type: String
-    Description: "Cognito UserPool ID passed from Cognito template."
+    Description: "Cognito UserPool ID passed from master template."
     Default: "placeholder"
   HostedUserPoolDomainName:
     Type: String
-    Description: "Cognito URL passed from Cognito template."
+    Description: "Cognito URL passed from master template."
     Default: "placeholder"
   CognitoCallbackUrl:
     Type: String
-    Description: "Cognito callback URL passed from Cognito template."
+    Description: "Cognito callback URL passed from master template."
     Default: "placeholder"
   CognitoUserPoolArn:
     Type: String
-    Description: "Cognito UserPool ARN passed from Cognito template."
+    Description: "Cognito UserPool ARN passed from master template."
     Default: "placeholder"
-
+  WsApiGwUrl:
+    Type: String
+    Description: "WebSocket API Gateway URL passed from master template."
+    Default: "placeholder"
+  LambdaWsHandlerName:
+    Type: String
+    Default: placeholder
+    Description: Name of the ws_handler Lambda, passed in from the master template.
 
 Resources:
 
@@ -90,6 +97,13 @@ Resources:
           - Action:
             - sagemaker:InvokeEndpoint
             Resource: arn:aws:sagemaker:*:*:endpoint/*
+            Effect: Allow
+      - PolicyName: WebSocketExecuteApiPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - execute-api:ManageConnections
+            Resource: "*"
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
@@ -166,6 +180,13 @@ Resources:
             - comprehend:DetectKeyPhrases
             Resource: "*"
             Effect: Allow
+      - PolicyName: WebSocketExecuteApiPolicy
+        PolicyDocument:
+          Statement:
+          - Action:
+            - execute-api:ManageConnections
+            Resource: "*"
+            Effect: Allow
       Path: "/"
       ManagedPolicyArns:
       - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -187,28 +208,8 @@ Resources:
       Environment:
         Variables:
           CLASSIFICATION_COUNT: "1"
+          WS_API_ENDPOINT: !Ref WsApiGwUrl
           ENDPOINT_NAME: !Ref SageMakerQuestionClassifierEndpointName
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
-          db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
-          db_url: !Ref EnvVarDbUrl
-          db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
-
-  LambdaChunkTextbook:
-    Type: AWS::Lambda::Function
-    Properties: 
-      Code: 
-        S3Bucket: !Ref S3ArtifactsBucket
-        S3Key: !Sub "${PythonLambdaDir}/chunkTextbook/chunkTextbook.zip"
-      FunctionName: chunkTextbook
-      Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
-      Role: !GetAtt RoleLambdaExecution.Arn
-      Runtime: python3.8
-      Layers: 
-        - !Ref LambdaPythonLayer 
-      Timeout: 300
-      Environment:
-        Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
@@ -782,6 +783,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
+          WS_API_URL: !Ref WsApiGwUrl
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
@@ -858,6 +860,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
+          WS_API_URL: !Ref WsApiGwUrl
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
@@ -907,7 +910,7 @@ Resources:
       Code: 
         S3Bucket: !Ref S3ArtifactsBucket
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/ws_handler.zip"
-      FunctionName: ws_handler
+      FunctionName: !Ref LambdaWsHandlerName
       Handler: "ws_handler.wsHandler"
       MemorySize: 128
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
@@ -915,6 +918,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
+          USER_POOL_ID: !Ref CognitoUserPoolId
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
@@ -936,13 +940,3 @@ Resources:
       Principal: cognito-idp.amazonaws.com
       FunctionName: !Ref LambdaAuthHook
       SourceArn: !Ref CognitoUserPoolArn
-          
-          
-          
-          
-          
-          
-          
-                  
-
-  
