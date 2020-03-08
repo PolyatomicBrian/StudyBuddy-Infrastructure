@@ -389,3 +389,95 @@ Resources:
         Fn::GetAtt:
         - CodeBuildRole
         - Arn
+
+
+  RoleHelperLambdaWaitForPipelineToDeploy:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+        - PolicyName: S3ObjectsPolicy
+          PolicyDocument:
+            Statement:
+            - Action:
+              - s3:List*
+              - s3:Get*
+              Resource: !Sub "arn:aws:s3:::${S3ArtifactsBucket}/*"
+              Effect: Allow
+        - PolicyName: S3BucketPolicy
+          PolicyDocument:
+            Statement:
+            - Action:
+              - s3:List*
+              - s3:Get*
+              Resource: !Sub "arn:aws:s3:::${S3ArtifactsBucket}"
+              Effect: Allow
+      Path: "/"
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+  # CloudFormation asynchronously invokes the CodePipeline upon its creation.
+  # Since we can't synchronously monitor the status of the Pipeline, we will
+  # create a Lambda function that just waits for it to finish deploying to
+  # the artifacts S3 bucket.
+  HelperLambdaWaitForPipelineToDeploy:
+    Type: AWS::Lambda::Function
+    DependsOn: BackendCodePipeline
+    Properties:
+      Code:
+        ZipFile: !Sub |
+          import json
+          import boto3
+          import time
+          import cfnresponse
+
+          client = boto3.client('s3')
+
+          def lambda_handler(event, context):
+            if event["RequestType"].lower() == "delete":
+              return cfnresponse.send(event, context, cfnresponse.SUCCESS, {"status": "Nothing to do"})
+            resp_chunk = ""
+            while resp_chunk == "":
+              try:
+                resp_chunk = getChunkModel()
+                print("Found chunk model")
+              except:
+                print("Missing chunk model")
+                time.sleep(5)
+            resp_question = ""
+            while resp_question == "":
+              try:
+                resp_question = getQuestionModel()
+                print("Found question model")
+              except:
+                print("Missing question model")
+                time.sleep(5)
+            return cfnresponse.send(event, context, cfnresponse.SUCCESS, {"status": "success"})
+
+          def getChunkModel():
+            return client.get_object(
+              Bucket='${S3ArtifactsBucket}',
+              Key='SageMaker/ChunkClassification/model.tar.gz',
+            )
+            
+          def getQuestionModel():
+            return client.get_object(
+              Bucket='${S3ArtifactsBucket}',
+              Key='SageMaker/QuestionClassification/model.tar.gz',
+            )
+      Handler: "index.lambda_handler"
+      MemorySize: 512
+      Role: !GetAtt RoleHelperLambdaWaitForPipelineToDeploy.Arn
+      Runtime: python3.7
+      Timeout: 600  # Busy wait for up to 10 minutes until the models have been deployed to the S3 bucket.
+  CustomTriggerLambdaWaitForPipelineToDeploy:
+    Type: Custom::LambdaWaitForPipelineToDeploy
+    Properties: 
+      ServiceToken: !GetAtt HelperLambdaWaitForPipelineToDeploy.Arn
