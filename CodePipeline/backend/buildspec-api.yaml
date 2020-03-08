@@ -29,6 +29,7 @@ phases:
         - cd ./NodeLambdas/
         - npm install
         - npm run build-all
+        - npm run promote-all || echo "promote-all failed"
         - echo Deployment complete.
 artifacts:
   files:

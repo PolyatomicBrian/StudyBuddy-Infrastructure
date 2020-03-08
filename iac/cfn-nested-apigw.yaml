@@ -28,6 +28,10 @@ Parameters:
     Type: String
     Default: placeholder
     Description: Required and used by the OpenAPI spec during the RestAPI creation.
+  LambdaWsHandlerName:
+    Type: String
+    Default: placeholder
+    Description: Name of the ws_handler Lambda, passed in from the master template.
 
 Resources:
 
@@ -53,6 +57,10 @@ Resources:
             Resource: "*"
             Effect: Allow
           Version: '2012-10-17'
+
+  ############
+  # REST API #
+  ############
 
   # Mapping for API GW
   RestApiStudyBuddyBackend:
@@ -108,5 +116,89 @@ Resources:
       DomainName: !Ref CustomDomainNameStudyBuddyApi
       RestApiId: !Ref RestApiStudyBuddyBackend
       Stage: !Ref StageStudyBuddyBackend
+
+  #################
+  # WebSocket API #
+  #################
+
+  WsApiGwApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      ApiKeySelectionExpression: "$request.header.x-api-key"
+      Description: "WebSocket API to provide live updates"
+      FailOnWarnings: false
+      Name: "StudyBuddyWs"
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+  WsApiGwAuthorizer:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties: 
+      ApiId: !Ref WsApiGwApi
+      AuthorizerCredentialsArn: !GetAtt RoleApiGwInvokeLambda.Arn
+      AuthorizerType: REQUEST
+      AuthorizerUri: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaWsHandlerName}"
+      IdentitySource:
+        - route.request.querystring.id_token
+      Name: WsAuth
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WsApiGwApi
+      RouteKey: $connect
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref WsApiGwAuthorizer
+      OperationName: ConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ConnectInteg
+  ConnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WsApiGwApi
+      CredentialsArn: !GetAtt RoleApiGwInvokeLambda.Arn
+      Description: "Connect Integration"
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaWsHandlerName}/invocations"
+
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WsApiGwApi
+      RouteKey: $disconnect
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref WsApiGwAuthorizer
+      OperationName: DisconnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref DisconnectInteg
+  DisconnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WsApiGwApi
+      CredentialsArn: !GetAtt RoleApiGwInvokeLambda.Arn
+      Description: "Disconnect Integration"
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaWsHandlerName}/invocations"
+
+  WsApiGwStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties: 
+      ApiId: !Ref WsApiGwApi
+      AutoDeploy: true
+      DeploymentId: !Ref WsApiGwDeployment
+      Description: "Stage of WebSocket API GW"
+      StageName: v1
+
+  WsApiGwDeployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    Properties: 
+      ApiId: !Ref WsApiGwApi
+      Description: "Deployment of WebSocket API GW"
+
+Outputs:
+  WsApiGwUrl:
+    Value: !Sub "https://${WsApiGwApi}.execute-api.${AWS::Region}.amazonaws.com/${WsApiGwStage}"
   
 

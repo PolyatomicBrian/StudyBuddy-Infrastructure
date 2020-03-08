@@ -73,6 +73,10 @@ Parameters:
     Type: String
     Default: master
     Description: Git branch of the backend repo to pull source code from.
+  LambdaWsHandlerName:
+    Type: String
+    Default: "ws_handler"
+    Description: Name of the WebSocket Handler Lambda.
 
 
 ######################################################
@@ -112,6 +116,8 @@ Resources:
         S3ArtifactsBucket: !Ref S3ArtifactsBucket
         HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
         S3DocumentsBucketName: !Ref S3DocumentsBucketName
+        WsApiGwUrl: !GetAtt NestedStackApiGateway.Outputs.WsApiGwUrl
+        LambdaWsHandlerName: !Ref LambdaWsHandlerName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
 
@@ -122,6 +128,7 @@ Resources:
         CognitoUserPoolArn: !GetAtt NestedStackCognito.Outputs.CognitoUserPoolArn
         APIUrl: !Ref APIUrl
         S3OpenApiSpecBucket: !Ref S3InfrastructureBucket
+        LambdaWsHandlerName: !Ref LambdaWsHandlerName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-apigw.yaml"
       TimeoutInMinutes: 10
   
