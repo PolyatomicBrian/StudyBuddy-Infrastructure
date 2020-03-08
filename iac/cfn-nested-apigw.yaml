@@ -135,7 +135,7 @@ Resources:
       ApiId: !Ref WsApiGwApi
       AuthorizerCredentialsArn: !GetAtt RoleApiGwInvokeLambda.Arn
       AuthorizerType: REQUEST
-      AuthorizerUri: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaWsHandlerName}"
+      AuthorizerUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaWsHandlerName}/invocations"
       IdentitySource:
         - route.request.querystring.id_token
       Name: WsAuth
@@ -165,8 +165,6 @@ Resources:
     Properties:
       ApiId: !Ref WsApiGwApi
       RouteKey: $disconnect
-      AuthorizationType: CUSTOM
-      AuthorizerId: !Ref WsApiGwAuthorizer
       OperationName: DisconnectRoute
       Target: !Join
         - '/'
@@ -192,6 +190,10 @@ Resources:
 
   WsApiGwDeployment:
     Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+    - DisconnectRoute
+    - ConnectRoute
+    - WsApiGwAuthorizer
     Properties: 
       ApiId: !Ref WsApiGwApi
       Description: "Deployment of WebSocket API GW"
