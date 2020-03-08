@@ -200,5 +200,6 @@ Resources:
 Outputs:
   WsApiGwUrl:
     Value: !Sub "https://${WsApiGwApi}.execute-api.${AWS::Region}.amazonaws.com/${WsApiGwStage}"
-  
+  WsApiGwWss:
+    Value: !Sub "wss://${WsApiGwApi}.execute-api.${AWS::Region}.amazonaws.com/${WsApiGwStage}"
 

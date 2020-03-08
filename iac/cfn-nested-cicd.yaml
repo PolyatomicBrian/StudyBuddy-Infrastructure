@@ -56,6 +56,11 @@ Parameters:
     Default: "cicd-github-access:SecretString:token"
     Description: GitHub token must be stored in SecretsManager.
 
+  WsApiGwWss:
+    Type: String
+    Default: "placeholder"
+    Description: WSS URI (wss://) of the WebSocket API GW, passed from the master template.
+
 Resources:
 
   ArtifactsBucket:
@@ -195,6 +200,8 @@ Resources:
                 sed -i "s|\"s3uploadUrl\": \".*\",|\"s3uploadUrl\": \"${S3DocumentsBucketDomainName}\",|g" $CONFIG_FILE
               - >-
                 sed -i "s|\"cognitoBase\": \".*\",|\"cognitoBase\": \"https://${HostedUserPoolDomainName}\",|g" $CONFIG_FILE
+              - >-
+                sed -i "s|\"wsUrl\": \".*\",|\"wsUrl\": \"${WsApiGwWss}\",|g" $CONFIG_FILE
               - >-
                 sed -i "s|\"cognitoClientId\": \".*\",|\"cognitoClientId\": \"${CognitoClientId}\",|g" $CONFIG_FILE
               - >-

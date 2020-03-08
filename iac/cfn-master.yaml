@@ -170,6 +170,7 @@ Resources:
         GitHubBranchFrontend: !Ref GitHubBranchFrontend
         GitHubBranchBackend: !Ref GitHubBranchBackend
         HostedUserPoolDomainName: !Ref HostedUserPoolDomainName
+        WsApiGwWss: !GetAtt NestedStackApiGateway.Outputs.WsApiGwWss
         CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
         S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
