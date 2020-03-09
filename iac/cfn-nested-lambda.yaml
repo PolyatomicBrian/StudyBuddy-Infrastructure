@@ -277,12 +277,12 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/classifyChunks/classifyChunks.zip"
       FunctionName: classifyChunks
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 1024
       Role: !GetAtt RoleClassifyChunksLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
         - !Ref LambdaPythonLayer 
-      Timeout: 300
+      Timeout: 900
       Environment:
         Variables:
           CLASSIFICATION_COUNT: "1"
@@ -425,13 +425,13 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/epubChunker/epubChunker.zip"
       FunctionName: epubChunker
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 1024
       Role: !GetAtt RoleEpubChunkerLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
         - !Ref LambdaPythonLayer 
         - !Ref LambdaPythonLxmlLayer
-      Timeout: 300
+      Timeout: 900
       Environment:
         Variables:
           DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucketName
