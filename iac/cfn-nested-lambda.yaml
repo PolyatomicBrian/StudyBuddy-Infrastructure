@@ -199,7 +199,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/askQuestion/askQuestion.zip"
       FunctionName: askQuestion
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 3008
       Role: !GetAtt RoleAskQuestionLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
