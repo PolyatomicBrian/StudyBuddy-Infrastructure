@@ -141,7 +141,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/deleteStudent/deleteStudent.zip"
       FunctionName: deleteStudent
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -223,7 +223,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/classifyChunk/classifyChunk.zip"
       FunctionName: classifyChunk
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -277,7 +277,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/classifyChunks/classifyChunks.zip"
       FunctionName: classifyChunks
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 1024
+      MemorySize: 2048
       Role: !GetAtt RoleClassifyChunksLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -301,7 +301,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/createConversation/createConversation.zip"
       FunctionName: createConversation
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -323,7 +323,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/createStudent/createStudent.zip"
       FunctionName: createStudent
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -344,7 +344,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/deleteBook/deleteBook.zip"
       FunctionName: deleteBook
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -365,7 +365,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/editBook/editBook.zip"
       FunctionName: editBook
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -425,7 +425,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/epubChunker/epubChunker.zip"
       FunctionName: epubChunker
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 1024
+      MemorySize: 2048
       Role: !GetAtt RoleEpubChunkerLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -444,7 +444,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/exchange/exchange.zip"
       FunctionName: exchange
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -500,7 +500,7 @@ Resources:
               ret_b64_auth = "Basic %s" % b64_auth.decode("utf-8")
               return cfnresponse.send(event, context, cfnresponse.SUCCESS, {"auth": ret_b64_auth})
       Handler: "index.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleHelperLambdaCognitoExecution.Arn
       Runtime: python3.7
       Timeout: 10
@@ -519,7 +519,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/getConversation/getConversation.zip"
       FunctionName: getConversation
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 1024
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -540,7 +540,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/getConversations/getConversations.zip"
       FunctionName: getConversations
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -561,7 +561,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/getSearchTerms/getSearchTerms.zip"
       FunctionName: getSearchTerms
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -580,7 +580,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/library/library.zip"
       FunctionName: library
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -624,7 +624,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/presign/presign.zip"
       FunctionName: presign
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaPresignExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -673,7 +673,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/process/process.zip"
       FunctionName: process
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 2048
       Role: !GetAtt RoleLambdaProcessExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -696,7 +696,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/rateresponse/rateresponse.zip"
       FunctionName: rateResponse
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -717,7 +717,7 @@ Resources:
         S3Key: !Sub "${PythonLambdaDir}/updateStudent/updateStudent.zip"
       FunctionName: updateStudent
       Handler: "lambda_function.lambda_handler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleLambdaExecution.Arn
       Runtime: python3.8
       Layers: 
@@ -758,7 +758,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/accept_invitation.zip"
       FunctionName: accept_invitation
       Handler: "accept_invitation.acceptInvitation"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -777,7 +777,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/add_user.zip"
       FunctionName: add_user
       Handler: "add_user.addUser"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -797,7 +797,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/auth_hook.zip"
       FunctionName: auth_hook
       Handler: "auth_hook.authHook"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -816,7 +816,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/get_invitation.zip"
       FunctionName: get_invitation
       Handler: "get_invitation.getInvitation"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -835,7 +835,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/handle_bounce.zip"
       FunctionName: handle_bounce
       Handler: "handle_bounce.handleBounce"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -854,7 +854,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/remove_user.zip"
       FunctionName: remove_user
       Handler: "remove_user.removeUser"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -874,7 +874,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/search_users.zip"
       FunctionName: search_users
       Handler: "search_users.searchUsers"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -893,7 +893,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/signup_hook.zip"
       FunctionName: signup_hook
       Handler: "signup_hook.signupHook"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
@@ -912,7 +912,7 @@ Resources:
         S3Key: !Sub "${NodeLambdaDir}/artifacts/zip/ws_handler.zip"
       FunctionName: !Ref LambdaWsHandlerName
       Handler: "ws_handler.wsHandler"
-      MemorySize: 128
+      MemorySize: 256
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
