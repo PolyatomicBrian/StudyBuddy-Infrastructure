@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-03-08T21:04:49Z"
+  version: "2020-05-05T04:23:03Z"
   title: "StudyBuddy"
 paths:
   /askquestion:
@@ -28,14 +28,14 @@ paths:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"question\" : $input.json('$.question'),\n    \"conversation_id\"\
             \ : $input.json('$.conversation_id')\n}"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -63,11 +63,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /book:
     delete:
@@ -124,13 +124,13 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
+        requestTemplates:
+          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
+            ,\n    \"doc_id\" : \"$input.params('doc_id')\"\n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
-            ,\n    \"doc_id\" : $input.json('$.doc_id')\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -158,11 +158,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
     patch:
       consumes:
@@ -207,15 +207,15 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"doc_id\" : $input.json('$.doc_id'),\n    \"new_title\" : $input.json('$.new_title'),\n\
             \    \"new_authors\" : $input.json('$.new_authors'),\n    \"new_edition\"\
             \ : $input.json('$.new_edition')\n}"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
   /conversation:
@@ -260,14 +260,14 @@ paths:
             statusCode: "500"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"doc_id\" : $input.json('$.doc_id'),\n    \"title\" : $input.json('$.title')\n\
             }"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -295,11 +295,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}:
     get:
@@ -352,13 +352,13 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
+        requestTemplates:
+          application/json: "{\n    \"conversation_id\" : \"$input.params('conversation-id')\"\
+            ,\n    \"user_id\": \"$context.authorizer.claims.sub\"\n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n    \"conversation_id\" : \"$input.params('conversation-id')\"\
-            ,\n    \"user_id\": \"$context.authorizer.claims.sub\"\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -386,11 +386,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}/books:
     put:
@@ -452,14 +452,14 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"doc_id\" : $input.json('$.doc_id'),\n    \"conversation_id\"\
             \ : \"$input.params('conversation-id')\"\n}"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -487,11 +487,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}/books/{doc-id}:
     delete:
@@ -557,14 +557,14 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"doc_id\" : \"$input.params('doc-id')\",\n    \"conversation_id\"\
             \ : \"$input.params('conversation-id')\"\n}"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -592,11 +592,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}/questions:
     post:
@@ -671,14 +671,14 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"conversation-id\" : \"$input.params('conversation-id')\"\
             ,\n    \"user_id\": \"$context.authorizer.claims.sub\",\n    \"question\"\
             \ : $input.json('$.question')\n}\n"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -706,11 +706,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}/users:
     put:
@@ -765,11 +765,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}/users/find:
     get:
@@ -824,11 +824,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversation/{conversation-id}/users/{user-id}:
     delete:
@@ -887,11 +887,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /conversations:
     get:
@@ -939,13 +939,13 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
+        requestTemplates:
+          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
+            \n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "never"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
-            \n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -973,11 +973,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /createstudent:
     post:
@@ -1032,11 +1032,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /deletebook:
     post:
@@ -1091,11 +1091,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /deletestudent:
     post:
@@ -1150,11 +1150,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /editbook:
     post:
@@ -1183,14 +1183,14 @@ paths:
         responses:
           default:
             statusCode: "200"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"doc_id\" : $input.json('$.doc_id'),\n    \"new_title\" : $input.json('$.new_title')\n\
             }"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -1218,11 +1218,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /exchange:
     post:
@@ -1295,11 +1295,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /getconversation:
     get:
@@ -1328,13 +1328,13 @@ paths:
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
               method.response.header.Server-Timing: "integration.response.body.timings"
+        requestTemplates:
+          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
+            ,\n    \"conversation_id\": \"$input.params('conversation_id')\"\n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
-            ,\n    \"conversation_id\": \"$input.params('conversation_id')\"\n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     post:
@@ -1389,11 +1389,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /getconversations:
     get:
@@ -1419,13 +1419,13 @@ paths:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\n       \"user_id\": \"$context.authorizer.claims.sub\"\
+            \n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n       \"user_id\": \"$context.authorizer.claims.sub\"\
-            \n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -1453,11 +1453,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /invitation:
     options:
@@ -1485,11 +1485,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /invitation/{invitation-key}:
     get:
@@ -1571,11 +1571,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /library:
     get:
@@ -1623,13 +1623,13 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
+        requestTemplates:
+          application/json: "{\n     \"user_id\": \"$context.authorizer.claims.sub\"\
+            \n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n     \"user_id\": \"$context.authorizer.claims.sub\"\
-            \n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -1657,11 +1657,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /login:
     post:
@@ -1714,11 +1714,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /presign:
     get:
@@ -1744,13 +1744,13 @@ paths:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\n     \"user_id\": \"$context.authorizer.claims.sub\"\
+            \n}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_templates"
         httpMethod: "POST"
-        requestTemplates:
-          application/json: "{\n     \"user_id\": \"$context.authorizer.claims.sub\"\
-            \n}"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -1778,11 +1778,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /process:
     post:
@@ -1808,15 +1808,15 @@ paths:
             statusCode: "200"
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'*'"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n     \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n     \"doc_name\": $input.json('$.doc_name'),\n     \"edition\": $input.json('$.edition'),\n\
             \     \"authors\": $input.json('$.authors'),\n     \"s3_directory\": $input.json('$.s3_directory')\n\
             }"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -1844,11 +1844,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /question:
     post:
@@ -1869,14 +1869,14 @@ paths:
         responses:
           default:
             statusCode: "200"
-        credentials:
-          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
-        passthroughBehavior: "when_no_templates"
-        httpMethod: "POST"
         requestTemplates:
           application/json: "{\n    \"user_id\": \"$context.authorizer.claims.sub\"\
             ,\n    \"question\" : $input.json('$.question'),\n    \"conversation_id\"\
             \ : $input.json('$.conversation_id')\n}"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     options:
@@ -1904,11 +1904,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /rate:
     post:
@@ -1961,11 +1961,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /rateresponse:
     post:
@@ -2020,11 +2020,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /signup:
     post:
@@ -2079,11 +2079,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
   /student:
     post:
@@ -2155,11 +2155,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
     patch:
       produces:
@@ -2236,11 +2236,11 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
         credentials:
           Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
         passthroughBehavior: "when_no_match"
-        requestTemplates:
-          application/json: "{\"statusCode\": 200}"
         type: "mock"
 securityDefinitions:
   Cognito:
