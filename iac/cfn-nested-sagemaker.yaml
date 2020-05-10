@@ -56,7 +56,7 @@ Resources:
 
   # ML model -- model data should be transferred from GitHub repo to S3 via
   # the backend CICD Pipeline.
-  SageMakerModelChunkClassifier:
+  SageMakerModelChunkClassifierV2:
     Type: AWS::SageMaker::Model
     Properties: 
       ModelName: "ChunkClassifierModel"
@@ -75,7 +75,7 @@ Resources:
     Properties:
       EndpointConfigName: "ChunkClassifierEndpointConfig"
       ProductionVariants:  
-      - ModelName: !GetAtt SageMakerModelChunkClassifier.ModelName
+      - ModelName: !GetAtt SageMakerModelChunkClassifierV2.ModelName
         VariantName: AllTraffic
         InitialInstanceCount: 1
         InstanceType: ml.t2.medium
