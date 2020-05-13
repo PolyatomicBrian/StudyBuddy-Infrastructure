@@ -453,7 +453,8 @@ Resources:
           Statement:
           - Action:
             - lambda:InvokeFunction
-            Resource: !GetAtt LambdaClassifyChunks.Arn
+            - textract:*
+            Resource: "*"
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
