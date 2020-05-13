@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-05-05T04:23:03Z"
+  version: "2020-05-11T16:19:17Z"
   title: "StudyBuddy"
 paths:
   /askquestion:
@@ -352,6 +352,61 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
               application/json: "$input.path('$.errorMessage')"
+        requestTemplates:
+          application/json: "{\n    \"conversation_id\" : \"$input.params('conversation-id')\"\
+            ,\n    \"user_id\": \"$context.authorizer.claims.sub\"\n}"
+        credentials:
+          Fn::Sub: "arn:aws:iam::${AWS::AccountId}:role/${RoleApiGwInvokeLambda}"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "conversation-id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+        400:
+          description: "400 response"
+          headers:
+            Acess-Control-Allow-Origin:
+              type: "string"
+        403:
+          description: "403 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+      security:
+      - Cognito: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:deleteConversation/invocations"
+        responses:
+          '.*"statusCode": 400.*':
+            statusCode: "400"
+            responseParameters:
+              method.response.header.Acess-Control-Allow-Origin: "'*'"
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+          '.*"statusCode": 403.*':
+            statusCode: "403"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
         requestTemplates:
           application/json: "{\n    \"conversation_id\" : \"$input.params('conversation-id')\"\
             ,\n    \"user_id\": \"$context.authorizer.claims.sub\"\n}"

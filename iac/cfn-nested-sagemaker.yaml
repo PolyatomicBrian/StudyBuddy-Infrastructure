@@ -56,10 +56,10 @@ Resources:
 
   # ML model -- model data should be transferred from GitHub repo to S3 via
   # the backend CICD Pipeline.
-  SageMakerModelChunkClassifier:
+  SageMakerModelChunkClassifierV2:
     Type: AWS::SageMaker::Model
     Properties: 
-      ModelName: "ChunkClassifierModel"
+      ModelName: "ChunkClassifierModelV2"
       ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
       PrimaryContainer:
         ModelDataUrl: !Sub s3://${S3ArtifactsBucket}/SageMaker/ChunkClassification/model.tar.gz
@@ -68,14 +68,14 @@ Resources:
   SageMakerChunkClassifierEndpoint:
     Type: "AWS::SageMaker::Endpoint"
     Properties:
-      EndpointConfigName: !GetAtt SageMakerChunkClassifierEndpointConfig.EndpointConfigName
+      EndpointConfigName: !GetAtt SageMakerChunkClassifierEndpointConfigV2.EndpointConfigName
 
-  SageMakerChunkClassifierEndpointConfig:
+  SageMakerChunkClassifierEndpointConfigV2:
     Type: "AWS::SageMaker::EndpointConfig"
     Properties:
-      EndpointConfigName: "ChunkClassifierEndpointConfig"
+      EndpointConfigName: "ChunkClassifierEndpointConfigV2"
       ProductionVariants:  
-      - ModelName: !GetAtt SageMakerModelChunkClassifier.ModelName
+      - ModelName: !GetAtt SageMakerModelChunkClassifierV2.ModelName
         VariantName: AllTraffic
         InitialInstanceCount: 1
         InstanceType: ml.t2.medium
@@ -83,10 +83,10 @@ Resources:
 
   # ML model -- model data should be transferred from GitHub repo to S3 via
   # the backend CICD Pipeline.
-  SageMakerModelQuestionClassifier:
+  SageMakerModelQuestionClassifierV2:
     Type: AWS::SageMaker::Model
     Properties: 
-      ModelName: "QuestionClassifierModel"
+      ModelName: "QuestionClassifierModelV2"
       ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
       PrimaryContainer:
         ModelDataUrl: !Sub s3://${S3ArtifactsBucket}/SageMaker/QuestionClassification/model.tar.gz
@@ -95,14 +95,14 @@ Resources:
   SageMakerQuestionClassifierEndpoint:
     Type: "AWS::SageMaker::Endpoint"
     Properties:
-      EndpointConfigName: !GetAtt SageMakerQuestionClassifierEndpointConfig.EndpointConfigName
+      EndpointConfigName: !GetAtt SageMakerQuestionClassifierEndpointConfigV2.EndpointConfigName
 
-  SageMakerQuestionClassifierEndpointConfig:
+  SageMakerQuestionClassifierEndpointConfigV2:
     Type: "AWS::SageMaker::EndpointConfig"
     Properties:
-      EndpointConfigName: "QuestionClassifierEndpointConfig"
+      EndpointConfigName: "QuestionClassifierEndpointConfigV2"
       ProductionVariants:  
-      - ModelName: !GetAtt SageMakerModelQuestionClassifier.ModelName
+      - ModelName: !GetAtt SageMakerModelQuestionClassifierV2.ModelName
         VariantName: AllTraffic
         InitialInstanceCount: 1
         InstanceType: ml.t2.medium
