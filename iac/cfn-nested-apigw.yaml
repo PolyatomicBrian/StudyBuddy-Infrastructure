@@ -79,10 +79,10 @@ Resources:
     Properties:
       StageName: !Ref StageName
       RestApiId: !Ref RestApiStudyBuddyBackend
-      DeploymentId: !Ref DeploymentStudyBuddyBackendV2
+      DeploymentId: !Ref DeploymentStudyBuddyBackend
 
   # Actual deployment of stage.
-  DeploymentStudyBuddyBackendV2:
+  DeploymentStudyBuddyBackend:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref RestApiStudyBuddyBackend
