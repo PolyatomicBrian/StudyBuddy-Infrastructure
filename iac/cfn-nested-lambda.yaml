@@ -699,7 +699,7 @@ Resources:
           Statement:
           - Action:
             - lambda:InvokeFunction
-            Resource: !GetAtt LambdaEpubChunker.Arn
+            Resource: "*"
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
