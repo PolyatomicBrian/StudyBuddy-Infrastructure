@@ -207,7 +207,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          CLASSIFICATION_COUNT: "1"
+          CLASSIFICATION_COUNT: "5"
           WS_API_ENDPOINT: !Ref WsApiGwUrl
           ENDPOINT_NAME: !Ref SageMakerQuestionClassifierEndpointName
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -231,7 +231,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          CLASSIFICATION_COUNT: "1"
+          CLASSIFICATION_COUNT: "3"
           ENDPOINT_NAME: !Ref SageMakerChunkClassifierEndpointName
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
@@ -285,7 +285,7 @@ Resources:
       Timeout: 900
       Environment:
         Variables:
-          CLASSIFICATION_COUNT: "1"
+          CLASSIFICATION_COUNT: "5"
           ENDPOINT_NAME: !Ref SageMakerChunkClassifierEndpointName
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
