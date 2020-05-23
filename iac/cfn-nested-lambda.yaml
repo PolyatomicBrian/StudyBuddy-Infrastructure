@@ -292,6 +292,9 @@ Resources:
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
           DOCUMENTS_FILES_BUCKET: !Ref S3DocumentsBucketName
+          MAXIMUM_NUMBER_PERCENTAGE: "0.2"
+          NUMBER_FILTER_MINIMUM: "300"
+          MINIMUM_WORDS: "3"
 
   LambdaCreateConversation:
     Type: AWS::Lambda::Function
