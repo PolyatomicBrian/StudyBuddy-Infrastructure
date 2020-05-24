@@ -295,6 +295,7 @@ Resources:
           MAXIMUM_NUMBER_PERCENTAGE: "0.2"
           NUMBER_FILTER_MINIMUM: "300"
           MINIMUM_WORDS: "3"
+          CLASSIFICATION_WEIGHT_ADJUST: "0.15"
 
   LambdaCreateConversation:
     Type: AWS::Lambda::Function
