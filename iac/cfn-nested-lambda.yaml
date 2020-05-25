@@ -748,6 +748,7 @@ Resources:
       Environment:
         Variables:
           DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucketName
+          BEANSTALK_URL: ""
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
