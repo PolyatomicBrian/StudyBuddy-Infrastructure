@@ -51,9 +51,9 @@ This repository contains or shall contain the following:
   - Store the following Secrets in AWS Secrets Manager:
   
     1. Create a new secret called `db-credentials` with the following keys:
-       1. `dbInstanceIdentifier` : The name of the database to be created in MySQL.
+       1. `dbInstanceIdentifier` : The name of the database to be created in MySQL. Must be alphanumeric!
        2. `username` : The username to be created for the MySQL RDS instance.
-       3. `password` : The password to be created for the MySQL RDS instance.
+       3. `password` : The password to be created for the MySQL RDS instance. Cannot contain '/'!
 
 
     2. Create a new secret called `cicd-github-access` with the following key:

@@ -16,11 +16,14 @@ Parameters:
   EnvVarDbPassword:
     Type: String
     Description: "DB password must be stored in SecretsManager. Provide the key name here."
-    Default: "db-credentials:SecretString:password"
+    Default: "db-credentials:password"
   EnvVarDbUser:
     Type: String
     Description: "DB username must be stored in SecretsManager. Provide the key name here."
-    Default: "db-credentials:SecretString:username"
+    Default: "db-credentials:username"
+  SecretName:
+    Type: String
+    Default: "db-credentials"
   S3ArtifactsBucket:
     Type: String
     Default: studybuddy-cicd-pipeline
@@ -47,17 +50,23 @@ Resources:
         BuildSpec: !Sub |
           version: 0.2
           phases:
+            env:
+              secrets-manager:
+                DBPASS: ${EnvVarDbPassword}
+                DBUSER: ${EnvVarDbUser}
             install:
               runtime-versions:
                 python: 3.7
               commands:
               - echo Installing source dependencies...
+              - apt-get update -y && apt-get dist-upgrade -y
               - apt-get install mysql-server -y
             build:
               commands:
               - echo Import started 
               - ls
-              - mysql -h ${RDSEndpointAddress} -u {{resolve:secretsmanager:${EnvVarDbUser}}} -p{{resolve:secretsmanager:${EnvVarDbPassword}}} < ${SqlDump}
+              - sed -i 's/buddy_admin/{{resolve:secretsmanager:${EnvVarDbUser}}}/g' ${SqlDump}
+              - mysql -h ${RDSEndpointAddress} -u {{resolve:secretsmanager:${EnvVarDbUser}}} -p$DBPASS < ${SqlDump}
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:2.0
@@ -105,6 +114,16 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: arn:aws:logs:*:*:*
+          -
+            Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterfacePermission
+            Resource: !Sub "arn:aws:ec2:*:${AWS::AccountId}:network-interface/*"
+          -
+            Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}*"
       Roles:
         -
           !Ref CodeBuildSQLImportRole

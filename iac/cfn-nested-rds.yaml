@@ -27,22 +27,26 @@ Parameters:
 Resources:
 
   RDSApplicationDB:
-    Type: AWS::RDS::DBInstance
+    Type: AWS::RDS::DBCluster
     Properties:
-      DBName: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
-      AllocatedStorage: "20"
-      CACertificateIdentifier: rds-ca-2019
-      DBInstanceClass: db.t2.micro
-      Engine: MySQL
-      EngineVersion: 5.7.22
+      DatabaseName: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+      Engine: aurora-mysql
+      EngineMode: serverless
+      EnableHttpEndpoint: true
+      ScalingConfiguration:
+        AutoPause: true
+        MaxCapacity: 1
+        MinCapacity: 1
+        SecondsUntilAutoPause: 300
+      StorageEncrypted: true
       MasterUsername: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}"
       MasterUserPassword: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}"
-      DBParameterGroupName: !Ref RDSApplicationDBParamGroup
+      DBClusterParameterGroupName: !Ref RDSApplicationDBParamGroup
 
   RDSApplicationDBParamGroup:
-    Type: AWS::RDS::DBParameterGroup
+    Type: AWS::RDS::DBClusterParameterGroup
     Properties:
-      Family: mysql5.7
+      Family: aurora-mysql5.7
       Description: "buddy-db"
       Parameters:
         group_concat_max_len: '18446744073709547519'

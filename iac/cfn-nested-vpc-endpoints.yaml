@@ -1,0 +1,90 @@
+# cfn-nested-vpc-endpoints.yaml
+# Author: Brian Jopling, August 2021
+#
+# Description:
+#   Deploys components VPC Endpoints to allow SDK calls to go through without egress internet access.
+#
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Nested template for creating RDS infra.
+
+Parameters:
+  VpcId:
+    Type: String
+    Default: "vpc-3827e242"
+    Description: "ID of vpc to be used by Lambdas (e.g. vpc-123abc45)" 
+  SecurityGroupId:
+    Type: String
+    Default: "sg-d66ab09c"
+    Description: "ID of security group to be used by Lambdas (e.g. sg-abc123)"
+  SubnetId1:
+    Type: String
+    Default: "subnet-05863059"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+  SubnetId2:
+    Type: String
+    Default: "subnet-cf90d585"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+  SubnetId3:
+    Type: String
+    Default: "subnet-615eee4f"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+
+Resources:
+
+  VpcEndpointComprehend:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      SecurityGroupIds: 
+        - !Ref SecurityGroupId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.comprehend"
+      SubnetIds: 
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+        - !Ref SubnetId3
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId
+
+  VpcEndpointTextract:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      SecurityGroupIds: 
+        - !Ref SecurityGroupId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.textract"
+      SubnetIds: 
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+        - !Ref SubnetId3
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId
+
+  VpcEndpointSageMaker:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      SecurityGroupIds: 
+        - !Ref SecurityGroupId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sagemaker.runtime"
+      SubnetIds: 
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+        - !Ref SubnetId3
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId
+
+  VpcEndpointLambda:
+    Type: AWS::EC2::VPCEndpoint
+    Properties: 
+      PrivateDnsEnabled: true
+      SecurityGroupIds: 
+        - !Ref SecurityGroupId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.lambda"
+      SubnetIds: 
+        - !Ref SubnetId1
+        - !Ref SubnetId2
+        - !Ref SubnetId3
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId

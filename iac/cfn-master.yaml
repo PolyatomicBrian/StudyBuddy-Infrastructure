@@ -55,7 +55,7 @@ Parameters:
     Description: Bucket that will be created during deployment. Will contain user uploaded books. Name must be unique.
   GitHubUserName:
     Type: String
-    Default: Chudly63
+    Default: PolyatomicBrian
     Description: Username of GitHub user who owns the repositories.
   GitHubFrontendRepo:
     Type: String
@@ -77,7 +77,26 @@ Parameters:
     Type: String
     Default: "ws_handler"
     Description: Name of the WebSocket Handler Lambda.
-
+  VpcId:
+    Type: String
+    Default: "vpc-3827e242"
+    Description: "ID of vpc to be used by Lambdas (e.g. vpc-123abc45)" 
+  SecurityGroupId:
+    Type: String
+    Default: "sg-d66ab09c"
+    Description: "ID of security group to be used by Lambdas (e.g. sg-abc123)"
+  SubnetId1:
+    Type: String
+    Default: "subnet-05863059"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+  SubnetId2:
+    Type: String
+    Default: "subnet-cf90d585"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+  SubnetId3:
+    Type: String
+    Default: "subnet-615eee4f"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
 
 ######################################################
 # RESOURCES 
@@ -118,8 +137,24 @@ Resources:
         S3DocumentsBucketName: !Ref S3DocumentsBucketName
         WsApiGwUrl: !GetAtt NestedStackApiGateway.Outputs.WsApiGwUrl
         LambdaWsHandlerName: !Ref LambdaWsHandlerName
+        SecurityGroupId: !Ref SecurityGroupId
+        SubnetId1: !Ref SubnetId1
+        SubnetId2: !Ref SubnetId2
+        SubnetId3: !Ref SubnetId3
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-lambda.yaml"
       TimeoutInMinutes: 10
+
+  # NestedStackVpcEndpoints:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     Parameters: 
+  #       VpcId: !Ref VpcId
+  #       SecurityGroupId: !Ref SecurityGroupId
+  #       SubnetId1: !Ref SubnetId1
+  #       SubnetId2: !Ref SubnetId2
+  #       SubnetId3: !Ref SubnetId3
+  #     TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-vpc-endpoints.yaml"
+  #     TimeoutInMinutes: 10
 
   NestedStackApiGateway:
     Type: AWS::CloudFormation::Stack
@@ -173,6 +208,7 @@ Resources:
         WsApiGwWss: !GetAtt NestedStackApiGateway.Outputs.WsApiGwWss
         CognitoClientId: !GetAtt NestedStackCognito.Outputs.CognitoClientId
         S3DocumentsBucketDomainName: !GetAtt NestedStackFrontendS3.Outputs.S3DocumentsBucketDomainName
+        URLBackend: !Ref APIUrl
       TemplateURL: !Sub "https://${S3InfrastructureBucket}.s3.amazonaws.com/cfn-nested-cicd.yaml"
       TimeoutInMinutes: 30
 

@@ -76,6 +76,22 @@ Parameters:
     Type: String
     Default: placeholder
     Description: Name of the ws_handler Lambda, passed in from the master template.
+  SecurityGroupId:
+    Type: String
+    Default: "sg-d66ab09c"
+    Description: "ID of security group to be used by Lambdas (e.g. sg-abc123)"
+  SubnetId1:
+    Type: String
+    Default: "subnet-05863059"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+  SubnetId2:
+    Type: String
+    Default: "subnet-cf90d585"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
+  SubnetId3:
+    Type: String
+    Default: "subnet-615eee4f"
+    Description: "A subnet ID to be used by Lambdas (e.g. subnet-1234567)"
 
 Resources:
 
@@ -107,7 +123,7 @@ Resources:
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
   LambdaPythonLxmlLayer:
     Type: AWS::Lambda::LayerVersion
@@ -189,7 +205,7 @@ Resources:
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
   LambdaAskQuestion:
     Type: AWS::Lambda::Function
@@ -205,6 +221,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           CLASSIFICATION_COUNT: "1"
@@ -267,7 +290,7 @@ Resources:
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
   LambdaClassifyChunks:
     Type: AWS::Lambda::Function
@@ -283,6 +306,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 900
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           CLASSIFICATION_COUNT: "5"
@@ -311,6 +341,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -375,6 +412,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -462,7 +506,7 @@ Resources:
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
   LambdaEpubChunker:
     Type: AWS::Lambda::Function
@@ -536,7 +580,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
       - "arn:aws:iam::aws:policy/AmazonCognitoReadOnly"
 
   HelperLambdaGenerateCognitoAuth:
@@ -591,6 +635,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -612,6 +663,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -652,6 +710,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -680,7 +745,7 @@ Resources:
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
   LambdaPresign:
     Type: AWS::Lambda::Function
@@ -729,7 +794,7 @@ Resources:
             Effect: Allow
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 
   LambdaProcess:
     Type: AWS::Lambda::Function
@@ -745,6 +810,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucketName
@@ -768,6 +840,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 10
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -789,6 +868,13 @@ Resources:
       Layers: 
         - !Ref LambdaPythonLayer 
       Timeout: 10
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -853,7 +939,7 @@ Resources:
           - sts:AssumeRole
       Path: "/"
       ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
       - "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
       - "arn:aws:iam::aws:policy/AmazonSESFullAccess"
       - "arn:aws:iam::aws:policy/AmazonCognitoReadOnly"
@@ -870,6 +956,13 @@ Resources:
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -909,6 +1002,13 @@ Resources:
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -928,6 +1028,13 @@ Resources:
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -947,6 +1054,13 @@ Resources:
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
@@ -986,6 +1100,13 @@ Resources:
       Role: !GetAtt RoleNodejsLambdaExecution.Arn
       Runtime: nodejs12.x
       Timeout: 300
+      VpcConfig:
+        SecurityGroupIds: 
+          - !Ref SecurityGroupId
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
+          - !Ref SubnetId3
       Environment:
         Variables:
           DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
