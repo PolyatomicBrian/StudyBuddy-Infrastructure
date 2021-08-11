@@ -195,7 +195,7 @@ Resources:
               commands:
               - echo Build started
               - >-
-                sed -i "s|$CONFIG_DEFAULT_BASE_URL|https://${URLBackend}|g" $CONFIG_FILE
+                sed -i "s|$CONFIG_DEFAULT_BASE_URL|https://${URLBackend}/v1|g" $CONFIG_FILE
               - >-
                 sed -i "s|\"s3uploadUrl\": \".*\",|\"s3uploadUrl\": \"${S3DocumentsBucketDomainName}\",|g" $CONFIG_FILE
               - >-
