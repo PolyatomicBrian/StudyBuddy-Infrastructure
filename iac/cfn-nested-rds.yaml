@@ -11,10 +11,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Nested template for creating RDS infra.
 
 Parameters:
-  EnvVarDbName:
-    Type: String
-    Description: "DB name must be stored in SecretsManager. Provide the key name here."
-    Default: "db-credentials:SecretString:dbInstanceIdentifier"
   EnvVarDbPassword:
     Type: String
     Description: "DB password must be stored in SecretsManager. Provide the key name here."
@@ -29,7 +25,7 @@ Resources:
   RDSApplicationDB:
     Type: AWS::RDS::DBCluster
     Properties:
-      DatabaseName: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+      DatabaseName: "buddy"
       Engine: aurora-mysql
       EngineMode: serverless
       EnableHttpEndpoint: true

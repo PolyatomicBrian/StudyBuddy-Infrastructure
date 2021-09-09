@@ -49,11 +49,11 @@ Resources:
         Location: !Sub ${S3ArtifactsBucket}/Database/
         BuildSpec: !Sub |
           version: 0.2
+          env:
+            secrets-manager:
+              DBPASS: ${EnvVarDbPassword}
+              DBUSER: ${EnvVarDbUser}
           phases:
-            env:
-              secrets-manager:
-                DBPASS: ${EnvVarDbPassword}
-                DBUSER: ${EnvVarDbUser}
             install:
               runtime-versions:
                 python: 3.7
@@ -65,8 +65,8 @@ Resources:
               commands:
               - echo Import started 
               - ls
-              - sed -i 's/buddy_admin/{{resolve:secretsmanager:${EnvVarDbUser}}}/g' ${SqlDump}
-              - mysql -h ${RDSEndpointAddress} -u {{resolve:secretsmanager:${EnvVarDbUser}}} -p$DBPASS < ${SqlDump}
+              - sed -i "s/buddy_admin/$DBUSER/g" ${SqlDump}
+              - mysql -h ${RDSEndpointAddress} -u $DBUSER -p$DBPASS < ${SqlDump}
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:2.0

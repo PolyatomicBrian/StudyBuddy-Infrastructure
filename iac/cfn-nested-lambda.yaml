@@ -10,10 +10,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Nested template for creating Lambda functions.
 
 Parameters:
-  EnvVarDbName:
-    Type: String
-    Description: "DB name must be stored in SecretsManager. Provide the key name here."
-    Default: "db-credentials:SecretString:dbInstanceIdentifier"
   EnvVarDbPassword:
     Type: String
     Description: "DB password must be stored in SecretsManager. Provide the key name here."
@@ -165,7 +161,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -233,7 +229,7 @@ Resources:
           CLASSIFICATION_COUNT: "1"
           WS_API_ENDPOINT: !Ref WsApiGwUrl
           ENDPOINT_NAME: !Ref SageMakerQuestionClassifierEndpointName
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -256,7 +252,7 @@ Resources:
         Variables:
           CLASSIFICATION_COUNT: "3"
           ENDPOINT_NAME: !Ref SageMakerChunkClassifierEndpointName
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -317,7 +313,7 @@ Resources:
         Variables:
           CLASSIFICATION_COUNT: "5"
           ENDPOINT_NAME: !Ref SageMakerChunkClassifierEndpointName
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -350,7 +346,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -372,7 +368,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -393,7 +389,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -421,7 +417,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -442,7 +438,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}"
@@ -463,7 +459,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -644,7 +640,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -672,7 +668,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -719,7 +715,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -821,7 +817,7 @@ Resources:
         Variables:
           DOCUMENT_FILES_BUCKET: !Ref S3DocumentsBucketName
           BEANSTALK_URL: ""
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -849,7 +845,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -877,7 +873,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -898,7 +894,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -919,7 +915,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          db_name: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           db_password: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           db_url: !Ref EnvVarDbUrl
           db_user: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -965,7 +961,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -985,7 +981,7 @@ Resources:
       Environment:
         Variables:
           WS_API_URL: !Ref WsApiGwUrl
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1011,7 +1007,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1037,7 +1033,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1063,7 +1059,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1083,7 +1079,7 @@ Resources:
       Environment:
         Variables:
           WS_API_URL: !Ref WsApiGwUrl
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1109,7 +1105,7 @@ Resources:
           - !Ref SubnetId3
       Environment:
         Variables:
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1128,7 +1124,7 @@ Resources:
       Timeout: 300
       Environment:
         Variables:
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
@@ -1148,7 +1144,7 @@ Resources:
       Environment:
         Variables:
           USER_POOL_ID: !Ref CognitoUserPoolId
-          DB_NAME: !Sub "{{resolve:secretsmanager:${EnvVarDbName}}}"
+          db_name: "buddy"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:${EnvVarDbPassword}}}" 
           DB_URL: !Ref EnvVarDbUrl
           DB_USER: !Sub "{{resolve:secretsmanager:${EnvVarDbUser}}}" 
